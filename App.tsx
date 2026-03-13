@@ -163,6 +163,60 @@ function playUndoSound() {
   osc.stop(t + 0.2);
 }
 
+function playSirenSound(direction: 'ltr' | 'rtl') {
+  const ctx = getAudioCtx();
+  // Sync with animation: 0.25s delay + 0.14s for the car to appear (5% of 2.8s)
+  const t = ctx.currentTime + 0.39;
+  const dur = 2.3; // covers on-screen portion of the 2.8s animation
+
+  // Signal chain: osc → lpf → masterGain → panner → destination
+  const panner = ctx.createStereoPanner();
+  panner.connect(ctx.destination);
+
+  const masterGain = ctx.createGain();
+  masterGain.connect(panner);
+
+  const lpf = ctx.createBiquadFilter();
+  lpf.type = 'lowpass';
+  lpf.frequency.value = 2400;
+  lpf.connect(masterGain);
+
+  const osc = ctx.createOscillator();
+  osc.type = 'sawtooth';
+  osc.connect(lpf);
+
+  // LFO → wee-woo warble: ~1.8 sweeps/s, ±130 Hz swing around base
+  const lfo = ctx.createOscillator();
+  lfo.type = 'sine';
+  lfo.frequency.value = 1.8;
+  const lfoGain = ctx.createGain();
+  lfoGain.gain.value = 130;
+  lfo.connect(lfoGain);
+  lfoGain.connect(osc.frequency);
+
+  // Doppler: base pitch high while approaching, sharp drop as it passes, low while receding
+  const passT = t + dur * 0.52; // the car crosses center slightly after midpoint
+  osc.frequency.setValueAtTime(840, t);
+  osc.frequency.linearRampToValueAtTime(870, passT - 0.15); // creeps up as it nears
+  osc.frequency.linearRampToValueAtTime(530, passT + 0.25); // sharp Doppler drop
+  osc.frequency.linearRampToValueAtTime(460, t + dur);      // fades away low
+
+  // Stereo pan follows the car across the screen
+  const p0 = direction === 'ltr' ? -0.9 : 0.9;
+  const p1 = direction === 'ltr' ?  0.9 : -0.9;
+  panner.pan.setValueAtTime(p0, t);
+  panner.pan.linearRampToValueAtTime(p1, t + dur);
+
+  // Volume envelope: fade in fast, hold, fade out at the end
+  masterGain.gain.setValueAtTime(0, t);
+  masterGain.gain.linearRampToValueAtTime(0.2, t + 0.22);
+  masterGain.gain.setValueAtTime(0.2, t + dur - 0.3);
+  masterGain.gain.linearRampToValueAtTime(0, t + dur);
+
+  lfo.start(t);  lfo.stop(t + dur);
+  osc.start(t);  osc.stop(t + dur);
+}
+
 const T: Record<
   Lang,
   {
@@ -583,6 +637,7 @@ export default function App() {
       triggerSiren(type === 'malePhone' ? 'male' : 'female');
       if (soundEnabled) {
         playInfractionSound();
+        playSirenSound(type === 'malePhone' ? 'ltr' : 'rtl');
         if (comboRef.current >= 2) playComboSound();
       }
       spawnFloatingEmoji('😡', 4);

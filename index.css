@@ -588,42 +588,22 @@ body {
 /* ── Police car ──────────────────────────────────────────────────────── */
 /* Male: flipped (faces right), left → right */
 @keyframes police-car-ltr {
-  from {
-    transform: translateX(-100px) scaleX(-1);
-    opacity: 0;
-  }
-  8% {
-    transform: translateX(-100px) scaleX(-1);
-    opacity: 1;
-  }
-  92% {
-    transform: translateX(calc(100vw + 100px)) scaleX(-1);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(calc(100vw + 100px)) scaleX(-1);
-    opacity: 0;
-  }
+  0%   { transform: translateX(-120px) scaleX(-1); opacity: 0; }
+  5%   { transform: translateX(-120px) scaleX(-1); opacity: 1; }
+  22%  { transform: translateX(18vw)   scaleX(-1); opacity: 1; } /* fast entry */
+  72%  { transform: translateX(82vw)   scaleX(-1); opacity: 1; } /* slow patrol */
+  88%  { transform: translateX(calc(100vw + 120px)) scaleX(-1); opacity: 1; } /* abrupt exit */
+  100% { transform: translateX(calc(100vw + 120px)) scaleX(-1); opacity: 0; }
 }
 
 /* Female: normal (faces left), right → left */
 @keyframes police-car-rtl {
-  from {
-    transform: translateX(calc(100vw + 100px));
-    opacity: 0;
-  }
-  8% {
-    transform: translateX(calc(100vw + 100px));
-    opacity: 1;
-  }
-  92% {
-    transform: translateX(-100px);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(-100px);
-    opacity: 0;
-  }
+  0%   { transform: translateX(calc(100vw + 120px)); opacity: 0; }
+  5%   { transform: translateX(calc(100vw + 120px)); opacity: 1; }
+  22%  { transform: translateX(82vw);  opacity: 1; } /* fast entry */
+  72%  { transform: translateX(18vw);  opacity: 1; } /* slow patrol */
+  88%  { transform: translateX(-120px); opacity: 1; } /* abrupt exit */
+  100% { transform: translateX(-120px); opacity: 0; }
 }
 
 .police-car {
@@ -639,12 +619,12 @@ body {
 
 .police-car--male {
   left: 0;
-  animation: police-car-ltr 2.2s ease-in-out 0.25s forwards;
+  animation: police-car-ltr 2.4s linear 0.25s forwards;
 }
 
 .police-car--female {
   left: 0;
-  animation: police-car-rtl 2.2s ease-in-out 0.25s forwards;
+  animation: police-car-rtl 2.4s linear 0.25s forwards;
 }
 
 .siren-overlay::before,

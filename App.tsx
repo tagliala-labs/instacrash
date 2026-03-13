@@ -473,10 +473,6 @@ export default function App() {
         <div className="mb-4 grid grid-cols-2 gap-3">
           {/* ── Male column ── */}
           <div className="col-male flex flex-col gap-2">
-            <div className="col-gender-header col-male-header">
-              <PersonIcon style={{ width: '1.4rem', height: '1.4rem' }} />
-              <span>Male driver</span>
-            </div>
             <button
               ref={(el) => {
                 btnRefs.current.male = el;
@@ -493,6 +489,10 @@ export default function App() {
               </div>
               <span className="count-number">{male}</span>
             </button>
+            <div className="col-gender-header col-male-header">
+              <PersonIcon style={{ width: '1.4rem', height: '1.4rem' }} />
+              <span>Male driver</span>
+            </div>
             <button
               ref={(el) => {
                 btnRefs.current.malePhone = el;
@@ -515,10 +515,6 @@ export default function App() {
 
           {/* ── Female column ── */}
           <div className="col-female flex flex-col gap-2">
-            <div className="col-gender-header col-female-header">
-              <PersonDressIcon style={{ width: '1.4rem', height: '1.4rem' }} />
-              <span>Female driver</span>
-            </div>
             <button
               ref={(el) => {
                 btnRefs.current.female = el;
@@ -535,6 +531,10 @@ export default function App() {
               </div>
               <span className="count-number">{female}</span>
             </button>
+            <div className="col-gender-header col-female-header">
+              <PersonDressIcon style={{ width: '1.4rem', height: '1.4rem' }} />
+              <span>Female driver</span>
+            </div>
             <button
               ref={(el) => {
                 btnRefs.current.femalePhone = el;

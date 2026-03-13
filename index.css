@@ -198,17 +198,14 @@ body {
       rgba(239, 68, 68, 0.13) 10px
     ),
     linear-gradient(145deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%);
-  border: 2px solid rgba(239, 68, 68, 0.55);
   box-shadow:
     0 8px 32px rgba(37, 99, 235, 0.35),
-    0 0 0 1px rgba(239, 68, 68, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-male-infraction:not(:disabled):hover {
   box-shadow:
     0 12px 40px rgba(37, 99, 235, 0.5),
-    0 0 0 1px rgba(239, 68, 68, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
@@ -222,17 +219,14 @@ body {
       rgba(239, 68, 68, 0.13) 10px
     ),
     linear-gradient(145deg, #9d174d 0%, #db2777 60%, #ec4899 100%);
-  border: 2px solid rgba(239, 68, 68, 0.55);
   box-shadow:
     0 8px 32px rgba(219, 39, 119, 0.35),
-    0 0 0 1px rgba(239, 68, 68, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-female-infraction:not(:disabled):hover {
   box-shadow:
     0 12px 40px rgba(219, 39, 119, 0.5),
-    0 0 0 1px rgba(239, 68, 68, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 

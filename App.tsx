@@ -7,6 +7,8 @@ import {
   CheckIcon,
   ChevronRightIcon,
   ClockRotateLeftIcon,
+  FaceAngryIcon,
+  FaceSmileBeamIcon,
   MobileScreenButtonIcon,
   PauseIcon,
   PersonDressIcon,
@@ -408,7 +410,7 @@ export default function App() {
             />
           </div>
           <p className="text-sm tracking-wider text-gray-500 uppercase">
-            Follow people using smartphone while driving
+            Follow people texting while driving
           </p>
         </div>
 
@@ -483,7 +485,14 @@ export default function App() {
               onClick={() => register('male')}
               disabled={!isRunning}
             >
-              <CheckIcon style={{ width: '1.6rem', height: '1.6rem' }} />
+              <div
+                style={{ display: 'flex', gap: '6px', alignItems: 'center' }}
+              >
+                <CheckIcon style={{ width: '1.4rem', height: '1.4rem' }} />
+                <FaceSmileBeamIcon
+                  style={{ width: '1.4rem', height: '1.4rem' }}
+                />
+              </div>
               <span className="count-number">{male}</span>
             </button>
             <button
@@ -494,9 +503,14 @@ export default function App() {
               onClick={() => register('malePhone')}
               disabled={!isRunning}
             >
-              <MobileScreenButtonIcon
-                style={{ width: '1.6rem', height: '1.6rem' }}
-              />
+              <div
+                style={{ display: 'flex', gap: '6px', alignItems: 'center' }}
+              >
+                <MobileScreenButtonIcon
+                  style={{ width: '1.4rem', height: '1.4rem' }}
+                />
+                <FaceAngryIcon style={{ width: '1.4rem', height: '1.4rem' }} />
+              </div>
               <span className="count-number">{malePhone}</span>
             </button>
           </div>
@@ -515,7 +529,14 @@ export default function App() {
               onClick={() => register('female')}
               disabled={!isRunning}
             >
-              <CheckIcon style={{ width: '1.6rem', height: '1.6rem' }} />
+              <div
+                style={{ display: 'flex', gap: '6px', alignItems: 'center' }}
+              >
+                <CheckIcon style={{ width: '1.4rem', height: '1.4rem' }} />
+                <FaceSmileBeamIcon
+                  style={{ width: '1.4rem', height: '1.4rem' }}
+                />
+              </div>
               <span className="count-number">{female}</span>
             </button>
             <button
@@ -526,9 +547,14 @@ export default function App() {
               onClick={() => register('femalePhone')}
               disabled={!isRunning}
             >
-              <MobileScreenButtonIcon
-                style={{ width: '1.6rem', height: '1.6rem' }}
-              />
+              <div
+                style={{ display: 'flex', gap: '6px', alignItems: 'center' }}
+              >
+                <MobileScreenButtonIcon
+                  style={{ width: '1.4rem', height: '1.4rem' }}
+                />
+                <FaceAngryIcon style={{ width: '1.4rem', height: '1.4rem' }} />
+              </div>
               <span className="count-number">{femalePhone}</span>
             </button>
           </div>

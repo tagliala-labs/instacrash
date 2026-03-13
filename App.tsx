@@ -624,109 +624,141 @@ export default function App() {
         </div>
 
         {/* History */}
-        {measurements.length > 0 && (
-          <div>
-            <div className="mb-3 flex items-center gap-2 text-xs tracking-widest text-gray-500 uppercase">
-              <ClockRotateLeftIcon
-                style={{
-                  width: '0.875rem',
-                  height: '0.875rem',
-                  color: '#4b5563',
-                }}
-              />
-              Past measurements
-            </div>
-            <div className="space-y-2">
-              {measurements.map((m, i) => {
-                const c = m.counts;
-                const tot = c.male + c.female + c.malePhone + c.femalePhone;
-                const infrPct = tot ? pct(c.malePhone + c.femalePhone, tot) : 0;
-                const d = new Date(m.date);
-                const dateStr = d.toLocaleDateString(undefined, {
-                  month: 'short',
-                  day: 'numeric',
-                });
-                const timeStr = d.toLocaleTimeString(undefined, {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                });
-                const rateColor =
-                  infrPct > 50
-                    ? 'text-red-400'
-                    : infrPct > 20
-                      ? 'text-amber-400'
-                      : 'text-green-400';
-                return (
-                  <div
-                    key={m.id}
-                    className="history-item"
-                    onClick={() => setSelectedMeasurement(m)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ')
-                        setSelectedMeasurement(m);
-                    }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-semibold tracking-wide text-white">
-                          Measurement #{measurements.length - i}
-                        </div>
-                        <div className="mono mt-0.5 text-xs text-gray-500">
-                          {dateStr} · {timeStr} · {formatTime(m.duration)}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div
-                          className={`mono text-lg font-medium ${rateColor}`}
-                        >
-                          {infrPct}%
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          infraction rate
-                        </div>
-                      </div>
-                      <ChevronRightIcon
-                        className="ml-3 text-gray-600"
-                        style={{ width: '0.75rem', height: '0.75rem' }}
-                      />
+        {measurements.length > 0 && (() => {
+          const gMale = measurements.reduce((s, m) => s + m.counts.male, 0);
+          const gFemale = measurements.reduce((s, m) => s + m.counts.female, 0);
+          const gMalePhone = measurements.reduce((s, m) => s + m.counts.malePhone, 0);
+          const gFemalePhone = measurements.reduce((s, m) => s + m.counts.femalePhone, 0);
+          const gTotal = gMale + gFemale + gMalePhone + gFemalePhone;
+          const gTotalMale = gMale + gMalePhone;
+          const gTotalFemale = gFemale + gFemalePhone;
+          return (
+            <div>
+              {/* Global aggregated stats */}
+              <div className="stat-card mb-4">
+                <div className="mb-3 flex items-center gap-2 text-xs tracking-widest text-gray-500 uppercase">
+                  <ChartPieIcon style={{ width: '0.875rem', height: '0.875rem', color: '#4b5563' }} />
+                  All-time totals · {measurements.length} session{measurements.length !== 1 ? 's' : ''}
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="stat-card text-center">
+                    <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">Male rate</div>
+                    <div className="mono text-2xl text-blue-400">
+                      {gTotalMale ? pct(gMalePhone, gTotalMale) : 0}%
                     </div>
-                    <div className="mt-3 flex gap-3">
-                      <div className="flex items-center gap-1.5 text-xs">
-                        <span
-                          className="h-2 w-2 rounded-full"
-                          style={{ background: '#2563eb' }}
-                        />
-                        <span className="text-gray-400">
-                          {c.male}{' '}
-                          <span className="text-blue-400">
-                            +{c.malePhone}📱
-                          </span>
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-xs">
-                        <span
-                          className="h-2 w-2 rounded-full"
-                          style={{ background: '#db2777' }}
-                        />
-                        <span className="text-gray-400">
-                          {c.female}{' '}
-                          <span className="text-pink-400">
-                            +{c.femalePhone}📱
-                          </span>
-                        </span>
-                      </div>
-                      <div className="ml-auto text-xs text-gray-500">
-                        {tot} observed
-                      </div>
-                    </div>
+                    <div className="mt-1 text-xs text-gray-600">{gMalePhone}/{gTotalMale}</div>
                   </div>
-                );
-              })}
+                  <div className="stat-card text-center">
+                    <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">Female rate</div>
+                    <div className="mono text-2xl text-pink-400">
+                      {gTotalFemale ? pct(gFemalePhone, gTotalFemale) : 0}%
+                    </div>
+                    <div className="mt-1 text-xs text-gray-600">{gFemalePhone}/{gTotalFemale}</div>
+                  </div>
+                  <div className="stat-card text-center">
+                    <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">Overall</div>
+                    <div className="mono text-2xl text-white">
+                      {gTotal ? pct(gMalePhone + gFemalePhone, gTotal) : 0}%
+                    </div>
+                    <div className="mt-1 text-xs text-gray-600">{gMalePhone + gFemalePhone}/{gTotal}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mb-3 flex items-center gap-2 text-xs tracking-widest text-gray-500 uppercase">
+                <ClockRotateLeftIcon
+                  style={{ width: '0.875rem', height: '0.875rem', color: '#4b5563' }}
+                />
+                Past measurements
+              </div>
+              <div className="space-y-2">
+                {measurements.map((m, i) => {
+                  const c = m.counts;
+                  const tot = c.male + c.female + c.malePhone + c.femalePhone;
+                  const infrPct = tot ? pct(c.malePhone + c.femalePhone, tot) : 0;
+                  const d = new Date(m.date);
+                  const dateStr = d.toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                  });
+                  const timeStr = d.toLocaleTimeString(undefined, {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  });
+                  const rateColor =
+                    infrPct > 50
+                      ? 'text-red-400'
+                      : infrPct > 20
+                        ? 'text-amber-400'
+                        : 'text-green-400';
+                  return (
+                    <div
+                      key={m.id}
+                      className="history-item"
+                      onClick={() => setSelectedMeasurement(m)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ')
+                          setSelectedMeasurement(m);
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-semibold tracking-wide text-white">
+                            Measurement #{measurements.length - i}
+                          </div>
+                          <div className="mono mt-0.5 text-xs text-gray-500">
+                            {dateStr} · {timeStr} · {formatTime(m.duration)}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className={`mono text-lg font-medium ${rateColor}`}>
+                            {infrPct}%
+                          </div>
+                          <div className="text-xs text-gray-500">infraction rate</div>
+                        </div>
+                        <div className="ml-3 flex items-center gap-2">
+                          <button
+                            className="text-gray-600 transition-colors hover:text-red-400"
+                            title="Delete measurement"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setMeasurements((prev) => prev.filter((x) => x.id !== m.id));
+                            }}
+                          >
+                            <XMarkIcon style={{ width: '1rem', height: '1rem' }} />
+                          </button>
+                          <ChevronRightIcon
+                            className="text-gray-600"
+                            style={{ width: '0.75rem', height: '0.75rem' }}
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-3 flex gap-3">
+                        <div className="flex items-center gap-1.5 text-xs">
+                          <span className="h-2 w-2 rounded-full" style={{ background: '#2563eb' }} />
+                          <span className="text-gray-400">
+                            {c.male}{' '}
+                            <span className="text-blue-400">+{c.malePhone}📱</span>
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-xs">
+                          <span className="h-2 w-2 rounded-full" style={{ background: '#db2777' }} />
+                          <span className="text-gray-400">
+                            {c.female}{' '}
+                            <span className="text-pink-400">+{c.femalePhone}📱</span>
+                          </span>
+                        </div>
+                        <div className="ml-auto text-xs text-gray-500">{tot} observed</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
 
       {/* Modal */}

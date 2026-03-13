@@ -379,148 +379,21 @@ body {
 }
 
 /* ── Police siren overlay ────────────────────────────────────────────── */
+/* Wave sweeps left→right (red) then right→left (blue) via alternate direction */
 @keyframes siren {
-  /* Red phase: fade in */
-  0% {
-    background:
-      radial-gradient(
-        ellipse at 15% 50%,
-        rgba(220, 38, 38, 0) 0%,
-        transparent 55%
-      ),
-      radial-gradient(
-        ellipse at 85% 50%,
-        rgba(37, 99, 235, 0) 0%,
-        transparent 55%
-      );
-    box-shadow: none;
+  from {
+    background: radial-gradient(
+      ellipse 70% 100% at 0% 50%,
+      rgba(220, 38, 38, 0.3) 0%,
+      transparent 100%
+    );
   }
-  /* Red phase: peak */
-  12% {
-    background:
-      radial-gradient(
-        ellipse at 15% 50%,
-        rgba(220, 38, 38, 0.75) 0%,
-        transparent 55%
-      ),
-      radial-gradient(
-        ellipse at 85% 50%,
-        rgba(37, 99, 235, 0) 0%,
-        transparent 55%
-      );
-    box-shadow:
-      inset 100px 0 160px rgba(220, 38, 38, 0.25),
-      inset -100px 0 40px rgba(37, 99, 235, 0);
-  }
-  /* Red phase: hold */
-  35% {
-    background:
-      radial-gradient(
-        ellipse at 15% 50%,
-        rgba(220, 38, 38, 0.75) 0%,
-        transparent 55%
-      ),
-      radial-gradient(
-        ellipse at 85% 50%,
-        rgba(37, 99, 235, 0) 0%,
-        transparent 55%
-      );
-    box-shadow:
-      inset 100px 0 160px rgba(220, 38, 38, 0.25),
-      inset -100px 0 40px rgba(37, 99, 235, 0);
-  }
-  /* Red phase: fade out → dark gap */
-  48% {
-    background:
-      radial-gradient(
-        ellipse at 15% 50%,
-        rgba(220, 38, 38, 0) 0%,
-        transparent 55%
-      ),
-      radial-gradient(
-        ellipse at 85% 50%,
-        rgba(37, 99, 235, 0) 0%,
-        transparent 55%
-      );
-    box-shadow: none;
-  }
-  /* Blue phase: fade in */
-  50% {
-    background:
-      radial-gradient(
-        ellipse at 15% 50%,
-        rgba(220, 38, 38, 0) 0%,
-        transparent 55%
-      ),
-      radial-gradient(
-        ellipse at 85% 50%,
-        rgba(37, 99, 235, 0) 0%,
-        transparent 55%
-      );
-    box-shadow: none;
-  }
-  /* Blue phase: peak */
-  62% {
-    background:
-      radial-gradient(
-        ellipse at 15% 50%,
-        rgba(220, 38, 38, 0) 0%,
-        transparent 55%
-      ),
-      radial-gradient(
-        ellipse at 85% 50%,
-        rgba(37, 99, 235, 0.75) 0%,
-        transparent 55%
-      );
-    box-shadow:
-      inset 100px 0 40px rgba(220, 38, 38, 0),
-      inset -100px 0 160px rgba(37, 99, 235, 0.25);
-  }
-  /* Blue phase: hold */
-  85% {
-    background:
-      radial-gradient(
-        ellipse at 15% 50%,
-        rgba(220, 38, 38, 0) 0%,
-        transparent 55%
-      ),
-      radial-gradient(
-        ellipse at 85% 50%,
-        rgba(37, 99, 235, 0.75) 0%,
-        transparent 55%
-      );
-    box-shadow:
-      inset 100px 0 40px rgba(220, 38, 38, 0),
-      inset -100px 0 160px rgba(37, 99, 235, 0.25);
-  }
-  /* Blue phase: fade out → dark gap */
-  98% {
-    background:
-      radial-gradient(
-        ellipse at 15% 50%,
-        rgba(220, 38, 38, 0) 0%,
-        transparent 55%
-      ),
-      radial-gradient(
-        ellipse at 85% 50%,
-        rgba(37, 99, 235, 0) 0%,
-        transparent 55%
-      );
-    box-shadow: none;
-  }
-  100% {
-    background:
-      radial-gradient(
-        ellipse at 15% 50%,
-        rgba(220, 38, 38, 0) 0%,
-        transparent 55%
-      ),
-      radial-gradient(
-        ellipse at 85% 50%,
-        rgba(37, 99, 235, 0) 0%,
-        transparent 55%
-      );
-    box-shadow: none;
+  to {
+    background: radial-gradient(
+      ellipse 70% 100% at 100% 50%,
+      rgba(37, 99, 235, 0.3) 0%,
+      transparent 100%
+    );
   }
 }
 
@@ -529,7 +402,7 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 40;
-  animation: siren 0.7s linear infinite;
+  animation: siren 1s ease-in-out infinite alternate;
 }
 
 /* ── Scrollbar ───────────────────────────────────────────────────────── */

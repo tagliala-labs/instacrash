@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0a0e1a"/>
+  <!-- Red siren glow left -->
+  <radialGradient id="rg" cx="20%" cy="50%" r="45%">
+    <stop offset="0%" stop-color="#dc2626" stop-opacity="0.55"/>
+    <stop offset="100%" stop-color="#dc2626" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="1200" height="630" fill="url(#rg)"/>
+  <!-- Blue siren glow right -->
+  <radialGradient id="blg" cx="80%" cy="50%" r="45%">
+    <stop offset="0%" stop-color="#2563eb" stop-opacity="0.55"/>
+    <stop offset="100%" stop-color="#2563eb" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="1200" height="630" fill="url(#blg)"/>
+  <!-- Subtle grid lines -->
+  <line x1="0" y1="315" x2="1200" y2="315" stroke="white" stroke-opacity="0.03" stroke-width="1"/>
+  <line x1="600" y1="0" x2="600" y2="630" stroke="white" stroke-opacity="0.03" stroke-width="1"/>
+  <!-- Car icon large, centered-left -->
+  <g transform="translate(180, 210) scale(0.38)">
+    <path fill="white" opacity="0.18" d="M135.2 117.4l-26.1 74.6 293.8 0-26.1-74.6C372.3 104.6 360.2 96 346.6 96L165.4 96c-13.6 0-25.7 8.6-30.2 21.4zM39.6 196.8L74.8 96.3C88.3 57.8 124.6 32 165.4 32l181.2 0c40.8 0 77.1 25.8 90.6 64.3l35.2 100.5c23.2 9.6 39.6 32.5 39.6 59.2l0 192c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32l0-32-320 0 0 32c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32L0 256c0-26.7 16.4-49.6 39.6-59.2zM128 304a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zm288 32a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"/>
+  </g>
+  <!-- Mobile icon large, right side -->
+  <g transform="translate(870, 185) scale(0.34)">
+    <path fill="white" opacity="0.18" d="M16 64C16 28.7 44.7 0 80 0L304 0c35.3 0 64 28.7 64 64l0 384c0 35.3-28.7 64-64 64L80 512c-35.3 0-64-28.7-64-64L16 64zm64 0l0 304 224 0 0-304-224 0zM192 472c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32z"/>
+  </g>
+  <!-- Main title -->
+  <text x="600" y="278" text-anchor="middle" font-family="Arial Black, Impact, sans-serif" font-size="118" font-weight="900" fill="white" letter-spacing="16" opacity="0.95">INSTACRASH</text>
+  <!-- Red/blue accent line under title -->
+  <linearGradient id="lg" x1="0" x2="1" y1="0" y2="0">
+    <stop offset="0%" stop-color="#dc2626"/>
+    <stop offset="50%" stop-color="#6b21a8" stop-opacity="0.4"/>
+    <stop offset="100%" stop-color="#2563eb"/>
+  </linearGradient>
+  <rect x="260" y="305" width="680" height="4" rx="2" fill="url(#lg)"/>
+  <!-- Subtitle -->
+  <text x="600" y="378" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" fill="#9ca3af" letter-spacing="6">SMARTPHONE USE WHILE DRIVING</text>
+  <!-- Bottom tag -->
+  <text x="600" y="560" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#374151" letter-spacing="3">tagliala-labs.github.io/instacrash</text>
+</svg>

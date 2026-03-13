@@ -66,6 +66,7 @@ body {
 .status-idle {
   background: rgba(55, 65, 81, 0.8);
   color: #9ca3af;
+  border: 1px solid transparent;
 }
 
 .status-running {

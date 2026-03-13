@@ -293,6 +293,16 @@ body {
   box-shadow: 0 6px 24px rgba(239, 68, 68, 0.5);
 }
 
+.ctrl-undo {
+  background: linear-gradient(135deg, #92400e, #b45309);
+  color: white;
+  box-shadow: 0 4px 16px rgba(180, 83, 9, 0.3);
+}
+
+.ctrl-undo:hover {
+  box-shadow: 0 6px 24px rgba(180, 83, 9, 0.5);
+}
+
 /* ── Stat card ───────────────────────────────────────────────────────── */
 .stat-card {
   background: var(--surface);

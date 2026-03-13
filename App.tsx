@@ -89,6 +89,7 @@ export default function App() {
   const sirenTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countsRef = useRef<Counts>({ ...EMPTY_COUNTS });
   const btnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const lastActionRef = useRef<Array<keyof Counts>>([]);
 
   // Chart canvas refs
   const liveCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -225,6 +226,7 @@ export default function App() {
       elapsedRef.current = 0;
       countsRef.current = { ...EMPTY_COUNTS };
       setCounts({ ...EMPTY_COUNTS });
+      lastActionRef.current = [];
       startTimeRef.current = Date.now();
       timerRef.current = setInterval(
         () => setDisplayTime(formatTime(getElapsed())),
@@ -263,6 +265,7 @@ export default function App() {
     elapsedRef.current = 0;
     countsRef.current = { ...EMPTY_COUNTS };
     setCounts({ ...EMPTY_COUNTS });
+    lastActionRef.current = [];
     setDisplayTime('00:00:00');
     setAppState('idle');
   }
@@ -299,12 +302,26 @@ export default function App() {
     countsRef.current = next;
     setCounts(next);
     bumpAnim(type);
+    lastActionRef.current.push(type);
     if (type === 'malePhone' || type === 'femalePhone') {
       triggerSiren();
       spawnFloatingEmoji('😡', 4);
     } else {
       spawnFloatingEmoji('😊', 3);
     }
+  }
+
+  function handleUndo() {
+    if (appState === 'idle') return;
+    const last = lastActionRef.current.pop();
+    if (!last) return;
+    const next = {
+      ...countsRef.current,
+      [last]: Math.max(0, countsRef.current[last] - 1),
+    };
+    countsRef.current = next;
+    setCounts(next);
+    spawnFloatingEmoji('😅', 2);
   }
 
   function bumpAnim(type: string) {
@@ -426,6 +443,16 @@ export default function App() {
                 <PlayIcon style={{ width: '1em', height: '1em' }} />
               )}
               <span>{startPauseLabel}</span>
+            </button>
+            <button
+              className="ctrl-btn ctrl-undo"
+              onClick={handleUndo}
+              style={{
+                visibility: isActive && total > 0 ? 'visible' : 'hidden',
+              }}
+            >
+              <span>↩</span>
+              <span>Undo</span>
             </button>
             <button
               className="ctrl-btn ctrl-end"

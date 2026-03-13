@@ -628,7 +628,8 @@ body {
 
 .police-car {
   position: fixed;
-  bottom: 18px;
+  /* sit above Safari bottom chrome + home indicator on iPhone */
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 80px);
   font-size: 3.4rem;
   pointer-events: none;
   z-index: 41;

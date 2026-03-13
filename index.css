@@ -402,7 +402,7 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 40;
-  animation: siren 1s ease-in-out infinite alternate;
+  animation: siren 0.5s ease-in-out infinite alternate;
 }
 
 /* ── Scrollbar ───────────────────────────────────────────────────────── */

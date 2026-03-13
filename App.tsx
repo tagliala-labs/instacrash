@@ -475,7 +475,7 @@ export default function App() {
           <div className="flex flex-col gap-2">
             <div className="col-gender-header col-male-header">
               <PersonIcon style={{ width: '1.4rem', height: '1.4rem' }} />
-              <span>Male</span>
+              <span>Male driver</span>
             </div>
             <button
               ref={(el) => {
@@ -486,12 +486,10 @@ export default function App() {
               disabled={!isRunning}
             >
               <div
-                style={{ display: 'flex', gap: '6px', alignItems: 'center' }}
+                style={{ display: 'flex', gap: '2px', alignItems: 'center' }}
               >
-                <CheckIcon style={{ width: '1.4rem', height: '1.4rem' }} />
-                <FaceSmileBeamIcon
-                  style={{ width: '1.4rem', height: '1.4rem' }}
-                />
+                <CheckIcon style={{ width: '2rem', height: '2rem' }} />
+                <FaceSmileBeamIcon style={{ width: '2rem', height: '2rem' }} />
               </div>
               <span className="count-number">{male}</span>
             </button>
@@ -504,12 +502,12 @@ export default function App() {
               disabled={!isRunning}
             >
               <div
-                style={{ display: 'flex', gap: '6px', alignItems: 'center' }}
+                style={{ display: 'flex', gap: '2px', alignItems: 'center' }}
               >
                 <MobileScreenButtonIcon
-                  style={{ width: '1.4rem', height: '1.4rem' }}
+                  style={{ width: '2rem', height: '2rem' }}
                 />
-                <FaceAngryIcon style={{ width: '1.4rem', height: '1.4rem' }} />
+                <FaceAngryIcon style={{ width: '2rem', height: '2rem' }} />
               </div>
               <span className="count-number">{malePhone}</span>
             </button>
@@ -519,7 +517,7 @@ export default function App() {
           <div className="flex flex-col gap-2">
             <div className="col-gender-header col-female-header">
               <PersonDressIcon style={{ width: '1.4rem', height: '1.4rem' }} />
-              <span>Female</span>
+              <span>Female driver</span>
             </div>
             <button
               ref={(el) => {
@@ -530,12 +528,10 @@ export default function App() {
               disabled={!isRunning}
             >
               <div
-                style={{ display: 'flex', gap: '6px', alignItems: 'center' }}
+                style={{ display: 'flex', gap: '2px', alignItems: 'center' }}
               >
-                <CheckIcon style={{ width: '1.4rem', height: '1.4rem' }} />
-                <FaceSmileBeamIcon
-                  style={{ width: '1.4rem', height: '1.4rem' }}
-                />
+                <CheckIcon style={{ width: '2rem', height: '2rem' }} />
+                <FaceSmileBeamIcon style={{ width: '2rem', height: '2rem' }} />
               </div>
               <span className="count-number">{female}</span>
             </button>
@@ -548,12 +544,12 @@ export default function App() {
               disabled={!isRunning}
             >
               <div
-                style={{ display: 'flex', gap: '6px', alignItems: 'center' }}
+                style={{ display: 'flex', gap: '2px', alignItems: 'center' }}
               >
                 <MobileScreenButtonIcon
-                  style={{ width: '1.4rem', height: '1.4rem' }}
+                  style={{ width: '2rem', height: '2rem' }}
                 />
-                <FaceAngryIcon style={{ width: '1.4rem', height: '1.4rem' }} />
+                <FaceAngryIcon style={{ width: '2rem', height: '2rem' }} />
               </div>
               <span className="count-number">{femalePhone}</span>
             </button>

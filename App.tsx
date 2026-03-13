@@ -408,7 +408,7 @@ export default function App() {
             />
           </div>
           <p className="text-sm tracking-wider text-gray-500 uppercase">
-            Smartphone use while driving
+            Follow people using smartphone while driving
           </p>
         </div>
 
@@ -472,7 +472,7 @@ export default function App() {
           {/* ── Male column ── */}
           <div className="flex flex-col gap-2">
             <div className="col-gender-header col-male-header">
-              <PersonIcon style={{ width: '1rem', height: '1rem' }} />
+              <PersonIcon style={{ width: '1.4rem', height: '1.4rem' }} />
               <span>Male</span>
             </div>
             <button
@@ -504,7 +504,7 @@ export default function App() {
           {/* ── Female column ── */}
           <div className="flex flex-col gap-2">
             <div className="col-gender-header col-female-header">
-              <PersonDressIcon style={{ width: '1rem', height: '1rem' }} />
+              <PersonDressIcon style={{ width: '1.4rem', height: '1.4rem' }} />
               <span>Female</span>
             </div>
             <button

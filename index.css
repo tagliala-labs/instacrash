@@ -108,11 +108,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 7px 0;
-  font-size: 0.72rem;
+  gap: 8px;
+  padding: 10px 0;
+  font-size: 0.9rem;
   font-weight: 700;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   border-radius: 10px;
 }
@@ -189,28 +189,28 @@ body {
 }
 
 .btn-male-infraction {
-  background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 30%, #7f1d1d 100%);
+  background: linear-gradient(145deg, #0f2460 0%, #1e3a8a 50%, #1d4ed8 100%);
   box-shadow:
-    0 8px 32px rgba(127, 29, 29, 0.4),
+    0 8px 32px rgba(30, 58, 138, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .btn-male-infraction:not(:disabled):hover {
   box-shadow:
-    0 12px 40px rgba(220, 38, 38, 0.5),
+    0 12px 40px rgba(37, 99, 235, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-female-infraction {
-  background: linear-gradient(135deg, #9d174d 0%, #7c3aed 40%, #7f1d1d 100%);
+  background: linear-gradient(145deg, #4a0728 0%, #831843 50%, #9d174d 100%);
   box-shadow:
-    0 8px 32px rgba(127, 29, 29, 0.4),
+    0 8px 32px rgba(131, 24, 67, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .btn-female-infraction:not(:disabled):hover {
   box-shadow:
-    0 12px 40px rgba(220, 38, 38, 0.5),
+    0 12px 40px rgba(157, 23, 77, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 

@@ -586,23 +586,35 @@ body {
 }
 
 /* ── Police car ──────────────────────────────────────────────────────── */
+/*
+  Velocity phases (linear timing, position-controlled):
+    fast entry → braking (nose dips) → almost stop → accelerate (nose lifts) → abrupt exit
+  Rotation convention:
+    LTR (scaleX(-1)): rotateZ(neg) = visual CW = right/front dips; rotateZ(pos) = front lifts
+    RTL (no scale):   rotateZ(neg) = CCW = left/front dips;         rotateZ(pos) = front lifts
+*/
+
 /* Male: flipped (faces right), left → right */
 @keyframes police-car-ltr {
   0%   { transform: translateX(-120px) scaleX(-1); opacity: 0; }
-  5%   { transform: translateX(-120px) scaleX(-1); opacity: 1; }
-  22%  { transform: translateX(18vw)   scaleX(-1); opacity: 1; } /* fast entry */
-  72%  { transform: translateX(82vw)   scaleX(-1); opacity: 1; } /* slow patrol */
-  88%  { transform: translateX(calc(100vw + 120px)) scaleX(-1); opacity: 1; } /* abrupt exit */
+  5%   { transform: translateX(-120px) scaleX(-1) rotateZ(0deg);   opacity: 1; }
+  22%  { transform: translateX(28vw)   scaleX(-1) rotateZ(0deg);   opacity: 1; } /* fast entry */
+  38%  { transform: translateX(39vw)   scaleX(-1) rotateZ(-12deg); opacity: 1; } /* braking, nose dips */
+  57%  { transform: translateX(47vw)   scaleX(-1) rotateZ(-15deg); opacity: 1; } /* almost stopped */
+  72%  { transform: translateX(62vw)   scaleX(-1) rotateZ(10deg);  opacity: 1; } /* accelerating, nose lifts */
+  85%  { transform: translateX(calc(100vw + 120px)) scaleX(-1) rotateZ(0deg); opacity: 1; } /* abrupt exit */
   100% { transform: translateX(calc(100vw + 120px)) scaleX(-1); opacity: 0; }
 }
 
 /* Female: normal (faces left), right → left */
 @keyframes police-car-rtl {
   0%   { transform: translateX(calc(100vw + 120px)); opacity: 0; }
-  5%   { transform: translateX(calc(100vw + 120px)); opacity: 1; }
-  22%  { transform: translateX(82vw);  opacity: 1; } /* fast entry */
-  72%  { transform: translateX(18vw);  opacity: 1; } /* slow patrol */
-  88%  { transform: translateX(-120px); opacity: 1; } /* abrupt exit */
+  5%   { transform: translateX(calc(100vw + 120px)) rotateZ(0deg);   opacity: 1; }
+  22%  { transform: translateX(72vw)  rotateZ(0deg);   opacity: 1; } /* fast entry */
+  38%  { transform: translateX(61vw)  rotateZ(-12deg); opacity: 1; } /* braking, nose dips */
+  57%  { transform: translateX(53vw)  rotateZ(-15deg); opacity: 1; } /* almost stopped */
+  72%  { transform: translateX(38vw)  rotateZ(10deg);  opacity: 1; } /* accelerating, nose lifts */
+  85%  { transform: translateX(-120px) rotateZ(0deg);  opacity: 1; } /* abrupt exit */
   100% { transform: translateX(-120px); opacity: 0; }
 }
 
@@ -619,12 +631,12 @@ body {
 
 .police-car--male {
   left: 0;
-  animation: police-car-ltr 2.4s linear 0.25s forwards;
+  animation: police-car-ltr 2.8s linear 0.25s forwards;
 }
 
 .police-car--female {
   left: 0;
-  animation: police-car-rtl 2.4s linear 0.25s forwards;
+  animation: police-car-rtl 2.8s linear 0.25s forwards;
 }
 
 .siren-overlay::before,

@@ -1,26 +1,45 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <defs>
+    <clipPath id="c"><rect width="180" height="180" rx="40"/></clipPath>
+    <!-- Blue left glow -->
+    <radialGradient id="bg" cx="0%" cy="55%" r="75%" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Red right glow -->
+    <radialGradient id="rg" cx="100%" cy="55%" r="75%" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ef4444" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#ef4444" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
   <!-- Background -->
-  <rect width="180" height="180" fill="#0a0e1a"/>
-  <!-- Red siren glow left -->
-  <radialGradient id="rg" cx="35%" cy="50%" r="55%">
-    <stop offset="0%" stop-color="#dc2626" stop-opacity="0.7"/>
-    <stop offset="100%" stop-color="#dc2626" stop-opacity="0"/>
-  </radialGradient>
-  <rect width="180" height="180" fill="url(#rg)"/>
-  <!-- Blue siren glow right -->
-  <radialGradient id="bg" cx="65%" cy="50%" r="55%">
-    <stop offset="0%" stop-color="#2563eb" stop-opacity="0.7"/>
-    <stop offset="100%" stop-color="#2563eb" stop-opacity="0"/>
-  </radialGradient>
-  <rect width="180" height="180" fill="url(#bg)"/>
-  <!-- Car icon (white) centered -->
-  <g transform="translate(26, 60) scale(0.25)">
-    <path fill="white" opacity="0.95" d="M135.2 117.4l-26.1 74.6 293.8 0-26.1-74.6C372.3 104.6 360.2 96 346.6 96L165.4 96c-13.6 0-25.7 8.6-30.2 21.4zM39.6 196.8L74.8 96.3C88.3 57.8 124.6 32 165.4 32l181.2 0c40.8 0 77.1 25.8 90.6 64.3l35.2 100.5c23.2 9.6 39.6 32.5 39.6 59.2l0 192c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32l0-32-320 0 0 32c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32L0 256c0-26.7 16.4-49.6 39.6-59.2zM128 304a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zm288 32a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"/>
+  <rect width="180" height="180" rx="40" fill="#0a0e1a"/>
+  <!-- Siren glows -->
+  <rect width="180" height="180" rx="40" fill="url(#bg)"/>
+  <rect width="180" height="180" rx="40" fill="url(#rg)"/>
+
+  <!-- Siren light bar -->
+  <rect x="46" y="22" width="88" height="22" rx="11" fill="#111827"/>
+  <rect x="49" y="25" width="38" height="16" rx="8" fill="#ef4444"/>
+  <rect x="93" y="25" width="38" height="16" rx="8" fill="#3b82f6"/>
+  <!-- Centre divider -->
+  <rect x="88" y="25" width="4" height="16" fill="#0a0e1a"/>
+
+  <!-- Police car body (FA car icon, 512×~450 source, scaled to ~150px wide) -->
+  <g transform="translate(15, 53) scale(0.293)" clip-path="url(#c)">
+    <path fill="white"
+      d="M135.2 117.4l-26.1 74.6h293.8l-26.1-74.6C372.3 104.6 360.2 96 346.6 96H165.4c-13.6 0-25.7 8.6-30.2 21.4z
+         M39.6 196.8L74.8 96.3C88.3 57.8 124.6 32 165.4 32h181.2c40.8 0 77.1 25.8 90.6 64.3l35.2 100.5
+         c23.2 9.6 39.6 32.5 39.6 59.2v192c0 17.7-14.3 32-32 32h-32c-17.7 0-32-14.3-32-32v-32H96v32
+         c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32V256c0-26.7 16.4-49.6 39.6-59.2z
+         M128 304a32 32 0 1 0-64 0 32 32 0 0 0 64 0z
+         M384 304a32 32 0 1 0 0-64 32 32 0 0 0 0 64z"/>
   </g>
-  <!-- Mobile icon (white) right side -->
-  <g transform="translate(104, 55) scale(0.185)">
-    <path fill="white" opacity="0.95" d="M16 64C16 28.7 44.7 0 80 0L304 0c35.3 0 64 28.7 64 64l0 384c0 35.3-28.7 64-64 64L80 512c-35.3 0-64-28.7-64-64L16 64zm64 0l0 304 224 0 0-304-224 0zM192 472c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32z"/>
-  </g>
-  <!-- App name -->
-  <text x="90" y="155" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="20" font-weight="900" fill="white" opacity="0.9" letter-spacing="3">INSTACRASH</text>
+
+  <!-- Bottom wordmark -->
+  <text x="90" y="166" text-anchor="middle"
+        font-family="Arial Black, Impact, sans-serif"
+        font-size="15" font-weight="900" fill="white" opacity="0.55"
+        letter-spacing="4">INSTACRASH</text>
 </svg>

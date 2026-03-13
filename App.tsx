@@ -16,6 +16,8 @@ import {
   PlayIcon,
   RotateLeftIcon,
   TrashIcon,
+  VolumeHighIcon,
+  VolumeXmarkIcon,
   XMarkIcon,
 } from './icons';
 
@@ -41,6 +43,7 @@ interface Measurement {
 
 // ── Constants ──────────────────────────────────────────────────────────────
 const STORAGE_KEY = 'instacrash-measurements';
+const SOUND_KEY = 'instacrash-sound';
 const CHART_COLORS = ['#2563eb', '#db2777', '#374151'];
 const EMPTY_COUNTS: Counts = {
   male: 0,
@@ -59,6 +62,84 @@ function detectLang(): Lang {
     if (s === 'en' || s === 'it') return s;
   } catch {}
   return (navigator.language ?? '').toLowerCase().startsWith('it') ? 'it' : 'en';
+}
+
+function detectSound(): boolean {
+  try {
+    const s = localStorage.getItem(SOUND_KEY);
+    if (s === 'false') return false;
+  } catch {}
+  return true;
+}
+
+// ── Web Audio sound engine ─────────────────────────────────────────────────
+let _audioCtx: AudioContext | null = null;
+function getAudioCtx(): AudioContext {
+  if (!_audioCtx) _audioCtx = new AudioContext();
+  return _audioCtx;
+}
+
+function playSafeSound() {
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  // Crisp warm click: short sine burst at 880 Hz + 1320 Hz → descending ding
+  const freqs = [880, 1320];
+  freqs.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, t + i * 0.04);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.85, t + i * 0.04 + 0.12);
+    gain.gain.setValueAtTime(0, t + i * 0.04);
+    gain.gain.linearRampToValueAtTime(0.22, t + i * 0.04 + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.04 + 0.18);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t + i * 0.04);
+    osc.stop(t + i * 0.04 + 0.2);
+  });
+}
+
+function playInfractionSound() {
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  // Three-tone ascending alarm: 440 → 554 → 659 Hz (minor chord stab)
+  const steps = [440, 554, 659];
+  steps.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    // Add slight distortion via sawtooth
+    osc.type = i === 2 ? 'sawtooth' : 'square';
+    osc.frequency.setValueAtTime(freq, t + i * 0.07);
+    gain.gain.setValueAtTime(0, t + i * 0.07);
+    gain.gain.linearRampToValueAtTime(0.18, t + i * 0.07 + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.07 + 0.22);
+    // Low-pass to tame harshness
+    const lpf = ctx.createBiquadFilter();
+    lpf.type = 'lowpass';
+    lpf.frequency.value = 1800;
+    osc.connect(lpf);
+    lpf.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t + i * 0.07);
+    osc.stop(t + i * 0.07 + 0.25);
+  });
+}
+
+function playUndoSound() {
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(660, t);
+  osc.frequency.exponentialRampToValueAtTime(330, t + 0.15);
+  gain.gain.setValueAtTime(0.18, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(t);
+  osc.stop(t + 0.2);
 }
 
 const T: Record<
@@ -223,6 +304,7 @@ export default function App() {
     useState<Measurement | null>(null);
   const [lang, setLang] = useState<Lang>(detectLang);
   const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(detectSound);
   const [comboCount, setComboCount] = useState(0);
   const [longestCombo, setLongestCombo] = useState(0);
 
@@ -478,10 +560,12 @@ export default function App() {
       setComboCount(comboRef.current);
       if (comboRef.current >= 2) spawnComboText(comboRef.current);
       triggerSiren(type === 'malePhone' ? 'male' : 'female');
+      if (soundEnabled) playInfractionSound();
       spawnFloatingEmoji('😡', 4);
     } else {
       comboRef.current = 0;
       setComboCount(0);
+      if (soundEnabled) playSafeSound();
       spawnFloatingEmoji('😊', 3);
     }
   }
@@ -498,6 +582,7 @@ export default function App() {
     setCounts(next);
     comboRef.current = 0;
     setComboCount(0);
+    if (soundEnabled) playUndoSound();
     spawnFloatingEmoji('😅', 2);
   }
 
@@ -507,6 +592,14 @@ export default function App() {
       try {
         localStorage.setItem(LANG_KEY, next);
       } catch {}
+      return next;
+    });
+  }
+
+  function toggleSound() {
+    setSoundEnabled((prev) => {
+      const next = !prev;
+      try { localStorage.setItem(SOUND_KEY, String(next)); } catch {}
       return next;
     });
   }
@@ -579,12 +672,23 @@ export default function App() {
       <div className="mx-auto max-w-lg">
         {/* Header */}
         <div className="relative pt-2 pb-3 text-center">
-          <button
-            onClick={toggleLang}
-            className="absolute right-0 top-3 rounded px-2 py-1 text-xs font-semibold tracking-widest text-gray-500 uppercase transition-colors hover:text-white"
-          >
-            {lang === 'en' ? 'IT' : 'EN'}
-          </button>
+          <div className="absolute right-0 top-2 flex items-center gap-1">
+            <button
+              onClick={toggleSound}
+              className="rounded px-2 py-1 text-gray-500 transition-colors hover:text-white"
+              title={soundEnabled ? 'Mute sounds' : 'Enable sounds'}
+            >
+              {soundEnabled
+                ? <VolumeHighIcon style={{ width: '1rem', height: '1rem' }} />
+                : <VolumeXmarkIcon style={{ width: '1rem', height: '1rem' }} />}
+            </button>
+            <button
+              onClick={toggleLang}
+              className="rounded px-2 py-1 text-sm font-bold tracking-widest text-gray-500 uppercase transition-colors hover:text-white"
+            >
+              {lang === 'en' ? 'IT' : 'EN'}
+            </button>
+          </div>
           <div className="mb-1 flex items-center justify-center gap-3">
             <MobileScreenButtonIcon
               className="text-red-400"

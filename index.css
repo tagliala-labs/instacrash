@@ -163,70 +163,54 @@ body {
 }
 
 .btn-male {
-  background: linear-gradient(145deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%);
+  background: linear-gradient(145deg, #14532d 0%, #16a34a 55%, #2563eb 100%);
   box-shadow:
-    0 8px 32px rgba(37, 99, 235, 0.35),
+    0 8px 32px rgba(22, 163, 74, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-male:not(:disabled):hover {
   box-shadow:
-    0 12px 40px rgba(37, 99, 235, 0.5),
+    0 12px 40px rgba(22, 163, 74, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-female {
-  background: linear-gradient(145deg, #9d174d 0%, #db2777 60%, #ec4899 100%);
+  background: linear-gradient(145deg, #14532d 0%, #16a34a 55%, #db2777 100%);
   box-shadow:
-    0 8px 32px rgba(219, 39, 119, 0.35),
+    0 8px 32px rgba(22, 163, 74, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-female:not(:disabled):hover {
   box-shadow:
-    0 12px 40px rgba(219, 39, 119, 0.5),
+    0 12px 40px rgba(22, 163, 74, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-male-infraction {
-  background:
-    repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 8px,
-      rgba(239, 68, 68, 0.13) 8px,
-      rgba(239, 68, 68, 0.13) 10px
-    ),
-    linear-gradient(145deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%);
+  background: linear-gradient(145deg, #7f1d1d 0%, #dc2626 55%, #2563eb 100%);
   box-shadow:
-    0 8px 32px rgba(37, 99, 235, 0.35),
+    0 8px 32px rgba(220, 38, 38, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-male-infraction:not(:disabled):hover {
   box-shadow:
-    0 12px 40px rgba(37, 99, 235, 0.5),
+    0 12px 40px rgba(220, 38, 38, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-female-infraction {
-  background:
-    repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 8px,
-      rgba(239, 68, 68, 0.13) 8px,
-      rgba(239, 68, 68, 0.13) 10px
-    ),
-    linear-gradient(145deg, #9d174d 0%, #db2777 60%, #ec4899 100%);
+  background: linear-gradient(145deg, #7f1d1d 0%, #dc2626 55%, #db2777 100%);
   box-shadow:
-    0 8px 32px rgba(219, 39, 119, 0.35),
+    0 8px 32px rgba(220, 38, 38, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-female-infraction:not(:disabled):hover {
   box-shadow:
-    0 12px 40px rgba(219, 39, 119, 0.5),
+    0 12px 40px rgba(220, 38, 38, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 

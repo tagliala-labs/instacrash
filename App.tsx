@@ -349,7 +349,7 @@ export default function App() {
 
       <div className="mx-auto max-w-lg">
         {/* Header */}
-        <div className="pt-6 pb-4 text-center">
+        <div className="pt-2 pb-3 text-center">
           <div className="mb-1 flex items-center justify-center gap-3">
             <MobileScreenButtonIcon
               className="text-red-400"

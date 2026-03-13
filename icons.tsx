@@ -8,7 +8,7 @@ interface IconProps {
 export const PersonIcon: React.FC<IconProps> = ({ className, style }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 384 512"
+    viewBox="0 -40 384 555"
     fill="currentColor"
     className={className}
     style={style}
@@ -21,7 +21,7 @@ export const PersonIcon: React.FC<IconProps> = ({ className, style }) => (
 export const PersonDressIcon: React.FC<IconProps> = ({ className, style }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 384 512"
+    viewBox="0 -40 384 555"
     fill="currentColor"
     className={className}
     style={style}

@@ -380,38 +380,147 @@ body {
 
 /* ── Police siren overlay ────────────────────────────────────────────── */
 @keyframes siren {
-  0%,
-  100% {
+  /* Red phase: fade in */
+  0% {
     background:
       radial-gradient(
         ellipse at 15% 50%,
-        rgba(220, 38, 38, 0.65) 0%,
-        transparent 45%
+        rgba(220, 38, 38, 0) 0%,
+        transparent 55%
       ),
       radial-gradient(
         ellipse at 85% 50%,
-        rgba(37, 99, 235, 0.05) 0%,
-        transparent 45%
+        rgba(37, 99, 235, 0) 0%,
+        transparent 55%
+      );
+    box-shadow: none;
+  }
+  /* Red phase: peak */
+  12% {
+    background:
+      radial-gradient(
+        ellipse at 15% 50%,
+        rgba(220, 38, 38, 0.75) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse at 85% 50%,
+        rgba(37, 99, 235, 0) 0%,
+        transparent 55%
       );
     box-shadow:
-      inset 80px 0 120px rgba(220, 38, 38, 0.18),
-      inset -80px 0 60px rgba(37, 99, 235, 0.02);
+      inset 100px 0 160px rgba(220, 38, 38, 0.25),
+      inset -100px 0 40px rgba(37, 99, 235, 0);
   }
+  /* Red phase: hold */
+  35% {
+    background:
+      radial-gradient(
+        ellipse at 15% 50%,
+        rgba(220, 38, 38, 0.75) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse at 85% 50%,
+        rgba(37, 99, 235, 0) 0%,
+        transparent 55%
+      );
+    box-shadow:
+      inset 100px 0 160px rgba(220, 38, 38, 0.25),
+      inset -100px 0 40px rgba(37, 99, 235, 0);
+  }
+  /* Red phase: fade out → dark gap */
+  48% {
+    background:
+      radial-gradient(
+        ellipse at 15% 50%,
+        rgba(220, 38, 38, 0) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse at 85% 50%,
+        rgba(37, 99, 235, 0) 0%,
+        transparent 55%
+      );
+    box-shadow: none;
+  }
+  /* Blue phase: fade in */
   50% {
     background:
       radial-gradient(
         ellipse at 15% 50%,
-        rgba(220, 38, 38, 0.05) 0%,
-        transparent 45%
+        rgba(220, 38, 38, 0) 0%,
+        transparent 55%
       ),
       radial-gradient(
         ellipse at 85% 50%,
-        rgba(37, 99, 235, 0.65) 0%,
-        transparent 45%
+        rgba(37, 99, 235, 0) 0%,
+        transparent 55%
+      );
+    box-shadow: none;
+  }
+  /* Blue phase: peak */
+  62% {
+    background:
+      radial-gradient(
+        ellipse at 15% 50%,
+        rgba(220, 38, 38, 0) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse at 85% 50%,
+        rgba(37, 99, 235, 0.75) 0%,
+        transparent 55%
       );
     box-shadow:
-      inset 80px 0 60px rgba(220, 38, 38, 0.02),
-      inset -80px 0 120px rgba(37, 99, 235, 0.18);
+      inset 100px 0 40px rgba(220, 38, 38, 0),
+      inset -100px 0 160px rgba(37, 99, 235, 0.25);
+  }
+  /* Blue phase: hold */
+  85% {
+    background:
+      radial-gradient(
+        ellipse at 15% 50%,
+        rgba(220, 38, 38, 0) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse at 85% 50%,
+        rgba(37, 99, 235, 0.75) 0%,
+        transparent 55%
+      );
+    box-shadow:
+      inset 100px 0 40px rgba(220, 38, 38, 0),
+      inset -100px 0 160px rgba(37, 99, 235, 0.25);
+  }
+  /* Blue phase: fade out → dark gap */
+  98% {
+    background:
+      radial-gradient(
+        ellipse at 15% 50%,
+        rgba(220, 38, 38, 0) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse at 85% 50%,
+        rgba(37, 99, 235, 0) 0%,
+        transparent 55%
+      );
+    box-shadow: none;
+  }
+  100% {
+    background:
+      radial-gradient(
+        ellipse at 15% 50%,
+        rgba(220, 38, 38, 0) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse at 85% 50%,
+        rgba(37, 99, 235, 0) 0%,
+        transparent 55%
+      );
+    box-shadow: none;
   }
 }
 
@@ -420,7 +529,7 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 40;
-  animation: siren 0.35s ease-in-out infinite;
+  animation: siren 0.7s linear infinite;
 }
 
 /* ── Scrollbar ───────────────────────────────────────────────────────── */

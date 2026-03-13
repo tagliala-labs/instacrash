@@ -427,7 +427,7 @@ export default function App() {
             disabled={!isRunning}
           >
             <PersonIcon style={{ width: '2rem', height: '2rem' }} />
-            <span className="count-label">Male Driver</span>
+            <span className="count-label">😊 Male Driver</span>
             <span className="count-number">{male}</span>
           </button>
 
@@ -440,7 +440,7 @@ export default function App() {
             disabled={!isRunning}
           >
             <PersonDressIcon style={{ width: '2rem', height: '2rem' }} />
-            <span className="count-label">Female Driver</span>
+            <span className="count-label">😊 Female Driver</span>
             <span className="count-number">{female}</span>
           </button>
 
@@ -458,7 +458,7 @@ export default function App() {
                 style={{ width: '1.3rem', height: '1.3rem', color: '#fca5a5' }}
               />
             </div>
-            <span className="count-label">Male + Phone</span>
+            <span className="count-label">😡 Male + Phone</span>
             <span className="count-number">{malePhone}</span>
           </button>
 
@@ -476,7 +476,7 @@ export default function App() {
                 style={{ width: '1.3rem', height: '1.3rem', color: '#fca5a5' }}
               />
             </div>
-            <span className="count-label">Female + Phone</span>
+            <span className="count-label">😡 Female + Phone</span>
             <span className="count-number">{femalePhone}</span>
           </button>
         </div>

@@ -738,30 +738,28 @@ export default function App() {
           }}
         >
           <div className="modal-card">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-bold tracking-wide text-white">
-                  Measurement Results
-                </h2>
-                <p className="mono mt-0.5 text-xs text-gray-500">
-                  {new Date(selectedMeasurement.date).toLocaleDateString(
-                    undefined,
-                    { weekday: 'long', month: 'long', day: 'numeric' }
-                  )}{' '}
-                  · {formatTime(selectedMeasurement.duration)} duration ·{' '}
-                  {selectedMeasurement.counts.male +
-                    selectedMeasurement.counts.female +
-                    selectedMeasurement.counts.malePhone +
-                    selectedMeasurement.counts.femalePhone}{' '}
-                  observed
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedMeasurement(null)}
-                className="p-2 text-gray-500 transition-colors hover:text-white"
-              >
-                <XMarkIcon style={{ width: '1.25rem', height: '1.25rem' }} />
-              </button>
+            <button
+              onClick={() => setSelectedMeasurement(null)}
+              className="modal-close-btn text-gray-500 transition-colors hover:text-white"
+            >
+              <XMarkIcon style={{ width: '1.25rem', height: '1.25rem' }} />
+            </button>
+            <div className="mb-4 pr-8">
+              <h2 className="text-xl font-bold tracking-wide text-white">
+                Measurement Results
+              </h2>
+              <p className="mono mt-0.5 text-xs text-gray-500">
+                {new Date(selectedMeasurement.date).toLocaleDateString(
+                  undefined,
+                  { weekday: 'long', month: 'long', day: 'numeric' }
+                )}{' '}
+                · {formatTime(selectedMeasurement.duration)} duration ·{' '}
+                {selectedMeasurement.counts.male +
+                  selectedMeasurement.counts.female +
+                  selectedMeasurement.counts.malePhone +
+                  selectedMeasurement.counts.femalePhone}{' '}
+                observed
+              </p>
             </div>
 
             <div className="mb-6 flex justify-center" style={{ height: 200 }}>

@@ -283,13 +283,13 @@ body {
 }
 
 .ctrl-start {
-  background: linear-gradient(135deg, #059669, #10b981);
+  background: radial-gradient(circle at center, #10b981 0%, #2563eb 100%);
   color: white;
   box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
 }
 
 .ctrl-start:hover {
-  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 6px 24px rgba(37, 99, 235, 0.5);
 }
 
 .ctrl-pause {
@@ -303,23 +303,23 @@ body {
 }
 
 .ctrl-resume {
-  background: linear-gradient(135deg, #059669, #10b981);
+  background: radial-gradient(circle at center, #10b981 0%, #2563eb 100%);
   color: white;
   box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
 }
 
 .ctrl-resume:hover {
-  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 6px 24px rgba(37, 99, 235, 0.5);
 }
 
 .ctrl-end {
-  background: linear-gradient(135deg, #dc2626, #ef4444);
+  background: radial-gradient(circle at center, #ef4444 0%, #db2777 100%);
   color: white;
   box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
 }
 
 .ctrl-end:hover {
-  box-shadow: 0 6px 24px rgba(239, 68, 68, 0.5);
+  box-shadow: 0 6px 24px rgba(219, 39, 119, 0.5);
 }
 
 .ctrl-undo {
@@ -349,6 +349,12 @@ body {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 14px 18px;
+}
+
+@media (max-width: 420px) {
+  .stat-card {
+    padding: 10px 12px;
+  }
 }
 
 /* ── History item ────────────────────────────────────────────────────── */
@@ -394,11 +400,29 @@ body {
   background: #111827;
   border: 1px solid #374151;
   border-radius: 20px;
-  padding: 32px;
+  padding: 28px 32px 32px;
   width: min(520px, 95vw);
   max-height: 90vh;
   overflow-y: auto;
   animation: slide-up 0.25s ease;
+  position: relative;
+}
+
+@media (max-width: 420px) {
+  .modal-card {
+    padding: 22px 14px 24px;
+  }
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 8px;
+  line-height: 1;
 }
 
 @keyframes slide-up {

@@ -67,9 +67,10 @@ function detectLang(): Lang {
 function detectSound(): boolean {
   try {
     const s = localStorage.getItem(SOUND_KEY);
+    if (s === 'true') return true;
     if (s === 'false') return false;
   } catch {}
-  return true;
+  return false; // disabled by default
 }
 
 // ── Web Audio sound engine ─────────────────────────────────────────────────
@@ -103,26 +104,46 @@ function playSafeSound() {
 function playInfractionSound() {
   const ctx = getAudioCtx();
   const t = ctx.currentTime;
-  // Three-tone ascending alarm: 440 → 554 → 659 Hz (minor chord stab)
-  const steps = [440, 554, 659];
+  // Dramatic descending: three falling tones 740 → 494 → 330 Hz
+  const steps = [740, 494, 330];
   steps.forEach((freq, i) => {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    // Add slight distortion via sawtooth
-    osc.type = i === 2 ? 'sawtooth' : 'square';
-    osc.frequency.setValueAtTime(freq, t + i * 0.07);
-    gain.gain.setValueAtTime(0, t + i * 0.07);
-    gain.gain.linearRampToValueAtTime(0.18, t + i * 0.07 + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.07 + 0.22);
-    // Low-pass to tame harshness
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(freq, t + i * 0.1);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.7, t + i * 0.1 + 0.12);
+    gain.gain.setValueAtTime(0, t + i * 0.1);
+    gain.gain.linearRampToValueAtTime(i === 0 ? 0.22 : 0.16, t + i * 0.1 + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.1 + 0.28);
+    // Low-pass to add weight
     const lpf = ctx.createBiquadFilter();
     lpf.type = 'lowpass';
-    lpf.frequency.value = 1800;
+    lpf.frequency.value = 1400;
     osc.connect(lpf);
     lpf.connect(gain);
     gain.connect(ctx.destination);
-    osc.start(t + i * 0.07);
-    osc.stop(t + i * 0.07 + 0.25);
+    osc.start(t + i * 0.1);
+    osc.stop(t + i * 0.1 + 0.3);
+  });
+}
+
+function playComboSound() {
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  // Energetic ascending arpeggio: 523 → 659 → 784 → 1047 Hz (C5 E5 G5 C6)
+  const notes = [523, 659, 784, 1047];
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, t + i * 0.06);
+    gain.gain.setValueAtTime(0, t + i * 0.06);
+    gain.gain.linearRampToValueAtTime(0.2, t + i * 0.06 + 0.006);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.06 + 0.14);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t + i * 0.06);
+    osc.stop(t + i * 0.06 + 0.15);
   });
 }
 
@@ -560,7 +581,10 @@ export default function App() {
       setComboCount(comboRef.current);
       if (comboRef.current >= 2) spawnComboText(comboRef.current);
       triggerSiren(type === 'malePhone' ? 'male' : 'female');
-      if (soundEnabled) playInfractionSound();
+      if (soundEnabled) {
+        playInfractionSound();
+        if (comboRef.current >= 2) playComboSound();
+      }
       spawnFloatingEmoji('😡', 4);
     } else {
       comboRef.current = 0;

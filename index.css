@@ -585,6 +585,67 @@ body {
   z-index: 40;
 }
 
+/* ── Police car ──────────────────────────────────────────────────────── */
+/* Male: flipped (faces right), left → right */
+@keyframes police-car-ltr {
+  from {
+    transform: translateX(-100px) scaleX(-1);
+    opacity: 0;
+  }
+  8% {
+    transform: translateX(-100px) scaleX(-1);
+    opacity: 1;
+  }
+  92% {
+    transform: translateX(calc(100vw + 100px)) scaleX(-1);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(calc(100vw + 100px)) scaleX(-1);
+    opacity: 0;
+  }
+}
+
+/* Female: normal (faces left), right → left */
+@keyframes police-car-rtl {
+  from {
+    transform: translateX(calc(100vw + 100px));
+    opacity: 0;
+  }
+  8% {
+    transform: translateX(calc(100vw + 100px));
+    opacity: 1;
+  }
+  92% {
+    transform: translateX(-100px);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+}
+
+.police-car {
+  position: fixed;
+  bottom: 18px;
+  font-size: 3.4rem;
+  pointer-events: none;
+  z-index: 41;
+  line-height: 1;
+  opacity: 0;
+}
+
+.police-car--male {
+  left: 0;
+  animation: police-car-ltr 2.2s ease-in-out 0.25s forwards;
+}
+
+.police-car--female {
+  left: 0;
+  animation: police-car-rtl 2.2s ease-in-out 0.25s forwards;
+}
+
 .siren-overlay::before,
 .siren-overlay::after {
   content: '';

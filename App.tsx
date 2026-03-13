@@ -218,7 +218,7 @@ export default function App() {
   const [displayTime, setDisplayTime] = useState('00:00:00');
   const [measurements, setMeasurements] =
     useState<Measurement[]>(loadMeasurements);
-  const [sirenActive, setSirenActive] = useState(false);
+  const [sirenActive, setSirenActive] = useState<'male' | 'female' | null>(null);
   const [selectedMeasurement, setSelectedMeasurement] =
     useState<Measurement | null>(null);
   const [lang, setLang] = useState<Lang>(detectLang);
@@ -425,10 +425,10 @@ export default function App() {
     setAppState('idle');
   }
 
-  function triggerSiren() {
+  function triggerSiren(gender: 'male' | 'female') {
     if (sirenTimerRef.current) clearTimeout(sirenTimerRef.current);
-    setSirenActive(true);
-    sirenTimerRef.current = setTimeout(() => setSirenActive(false), 2500);
+    setSirenActive(gender);
+    sirenTimerRef.current = setTimeout(() => setSirenActive(null), 2500);
   }
 
   function spawnFloatingEmoji(emoji: string, count: number) {
@@ -477,7 +477,7 @@ export default function App() {
       }
       setComboCount(comboRef.current);
       if (comboRef.current >= 2) spawnComboText(comboRef.current);
-      triggerSiren();
+      triggerSiren(type === 'malePhone' ? 'male' : 'female');
       spawnFloatingEmoji('😡', 4);
     } else {
       comboRef.current = 0;
@@ -569,7 +569,12 @@ export default function App() {
       style={{ background: 'var(--bg)', color: 'var(--text)' }}
     >
       {/* Police siren overlay */}
-      {sirenActive && <div className="siren-overlay" aria-hidden="true" />}
+      {sirenActive && (
+        <>
+          <div className="siren-overlay" aria-hidden="true" />
+          <div className={`police-car police-car--${sirenActive}`} aria-hidden="true">🚓</div>
+        </>
+      )}
 
       <div className="mx-auto max-w-lg">
         {/* Header */}

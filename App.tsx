@@ -110,7 +110,7 @@ const T: Record<
     running: 'Running',
     paused: 'Paused',
     undoTitle: 'Undo last entry',
-    endTitle: 'End session',
+    endTitle: 'End',
     maleDriver: 'Male driver',
     femaleDriver: 'Female driver',
     liveBreakdown: 'Live infraction breakdown',
@@ -147,9 +147,9 @@ const T: Record<
     running: 'In corso',
     paused: 'In pausa',
     undoTitle: 'Annulla ultima voce',
-    endTitle: 'Termina sessione',
-    maleDriver: 'Autista uomo',
-    femaleDriver: 'Autista donna',
+    endTitle: 'Fine',
+    maleDriver: 'Guida uomo',
+    femaleDriver: 'Guida donna',
     liveBreakdown: 'Infrazioni in tempo reale',
     maleInfraction: 'Infrazione uomo',
     femaleInfraction: 'Infrazione donna',
@@ -560,8 +560,8 @@ export default function App() {
         </div>
 
         {/* Control Panel */}
-        <div className="stat-card mb-4">
-          <div className="mb-4 flex items-center gap-3">
+        <div className="stat-card mb-3">
+          <div className="mb-3 flex items-center gap-3">
             <div className="timer-display">{displayTime}</div>
             <span className={`status-pill ${statusPillClass}`}>
               <span className="status-dot" />
@@ -573,9 +573,7 @@ export default function App() {
             <button
               className="ctrl-btn ctrl-undo ctrl-side"
               onClick={handleUndo}
-              style={{
-                visibility: isActive && total > 0 ? 'visible' : 'hidden',
-              }}
+              disabled={!isActive || total === 0}
               title={t.undoTitle}
             >
               <RotateLeftIcon style={{ width: '1em', height: '1em' }} />
@@ -589,25 +587,25 @@ export default function App() {
               ) : (
                 <PlayIcon style={{ width: '1em', height: '1em' }} />
               )}
-              <span>{startPauseLabel}</span>
+              <span className="mr-auto">{startPauseLabel}</span>
             </button>
             <button
-              className="ctrl-btn ctrl-end ctrl-side"
+              className="ctrl-btn ctrl-end"
               onClick={handleEnd}
-              style={{ visibility: isActive ? 'visible' : 'hidden' }}
-              title={t.endTitle}
+              disabled={appState !== 'paused'}
             >
               <CheckeredFlagIcon style={{ width: '1em', height: '1em' }} />
+              <span>{t.endTitle}</span>
             </button>
           </div>
         </div>
 
         {/* Total observed */}
-        <div className="stat-card mb-4 flex items-center justify-between">
-          <span className="text-xs tracking-widest text-gray-500 uppercase">
+        <div className="stat-card mb-3 flex items-center justify-between">
+          <span className="text-base font-bold tracking-widest text-gray-400 uppercase">
             {t.totalObserved}
           </span>
-          <span className="mono text-4xl font-medium text-white">{total}</span>
+          <span className="mono text-2xl font-medium text-white">{total}</span>
         </div>
 
         {/* Count Buttons — two gender columns */}
@@ -1053,7 +1051,7 @@ export default function App() {
                       </div>
                     </div>
                   </div>
-                  <hr className="divider mt-4 mb-1" />
+                  <hr className="divider my-4" />
                   <button
                     className="flex w-full items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium text-red-500 transition-colors hover:bg-red-950 hover:text-red-400"
                     onClick={() => setPendingDeleteId(selectedMeasurement.id)}

@@ -270,7 +270,7 @@ export default function App() {
   function triggerSiren() {
     if (sirenTimerRef.current) clearTimeout(sirenTimerRef.current);
     setSirenActive(true);
-    sirenTimerRef.current = setTimeout(() => setSirenActive(false), 2000);
+    sirenTimerRef.current = setTimeout(() => setSirenActive(false), 2500);
   }
 
   function register(type: keyof Counts) {

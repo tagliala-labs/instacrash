@@ -36,6 +36,7 @@ interface Measurement {
   date: string; // ISO string
   duration: number; // ms
   counts: Counts;
+  longestCombo: number;
 }
 
 // ── Constants ──────────────────────────────────────────────────────────────
@@ -96,6 +97,8 @@ const T: Record<
     deleteMeasurement: string;
     deleteConfirmTitle: string;
     deleteConfirmBody: string;
+    best: string;
+    maxCombo: string;
     cancel: string;
     delete: string;
   }
@@ -134,6 +137,8 @@ const T: Record<
     deleteMeasurement: 'Delete measurement',
     deleteConfirmTitle: 'Delete this measurement?',
     deleteConfirmBody: 'This action cannot be undone.',
+    best: 'Best',
+    maxCombo: 'Max combo',
     cancel: 'Cancel',
     delete: 'Delete',
   },
@@ -171,6 +176,8 @@ const T: Record<
     deleteMeasurement: 'Elimina misurazione',
     deleteConfirmTitle: 'Eliminare questa misurazione?',
     deleteConfirmBody: "L'azione non può essere annullata.",
+    best: 'Migliore',
+    maxCombo: 'Max combo',
     cancel: 'Annulla',
     delete: 'Elimina',
   },
@@ -216,6 +223,8 @@ export default function App() {
     useState<Measurement | null>(null);
   const [lang, setLang] = useState<Lang>(detectLang);
   const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
+  const [comboCount, setComboCount] = useState(0);
+  const [longestCombo, setLongestCombo] = useState(0);
 
   // Refs for values used inside callbacks without causing re-renders
   const elapsedRef = useRef(0);
@@ -225,6 +234,8 @@ export default function App() {
   const countsRef = useRef<Counts>({ ...EMPTY_COUNTS });
   const btnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const lastActionRef = useRef<Array<keyof Counts>>([]);
+  const comboRef = useRef(0);
+  const longestComboRef = useRef(0);
 
   // Chart canvas refs
   const liveCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -362,6 +373,10 @@ export default function App() {
       countsRef.current = { ...EMPTY_COUNTS };
       setCounts({ ...EMPTY_COUNTS });
       lastActionRef.current = [];
+      comboRef.current = 0;
+      longestComboRef.current = 0;
+      setComboCount(0);
+      setLongestCombo(0);
       startTimeRef.current = Date.now();
       timerRef.current = setInterval(
         () => setDisplayTime(formatTime(getElapsed())),
@@ -395,12 +410,17 @@ export default function App() {
       date: new Date().toISOString(),
       duration: elapsedRef.current,
       counts: { ...countsRef.current },
+      longestCombo: longestComboRef.current,
     };
     setMeasurements((prev) => [snap, ...prev]);
     elapsedRef.current = 0;
     countsRef.current = { ...EMPTY_COUNTS };
     setCounts({ ...EMPTY_COUNTS });
     lastActionRef.current = [];
+    comboRef.current = 0;
+    longestComboRef.current = 0;
+    setComboCount(0);
+    setLongestCombo(0);
     setDisplayTime('00:00:00');
     setAppState('idle');
   }
@@ -428,6 +448,17 @@ export default function App() {
     }
   }
 
+  function spawnComboText(n: number) {
+    const el = document.createElement('div');
+    el.className = 'floating-combo';
+    el.textContent = `${n}\u00d7 COMBO`;
+    el.style.fontSize = `${1.4 + Math.min(n - 2, 6) * 0.15}rem`;
+    const vw = window.innerWidth;
+    el.style.left = `${vw * 0.15 + Math.random() * vw * 0.5}px`;
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove(), { once: true });
+  }
+
   function register(type: keyof Counts) {
     if (appState !== 'running') return;
     const next = {
@@ -439,9 +470,18 @@ export default function App() {
     bumpAnim(type);
     lastActionRef.current.push(type);
     if (type === 'malePhone' || type === 'femalePhone') {
+      comboRef.current += 1;
+      if (comboRef.current > longestComboRef.current) {
+        longestComboRef.current = comboRef.current;
+        setLongestCombo(longestComboRef.current);
+      }
+      setComboCount(comboRef.current);
+      if (comboRef.current >= 2) spawnComboText(comboRef.current);
       triggerSiren();
       spawnFloatingEmoji('😡', 4);
     } else {
+      comboRef.current = 0;
+      setComboCount(0);
       spawnFloatingEmoji('😊', 3);
     }
   }
@@ -456,6 +496,8 @@ export default function App() {
     };
     countsRef.current = next;
     setCounts(next);
+    comboRef.current = 0;
+    setComboCount(0);
     spawnFloatingEmoji('😅', 2);
   }
 
@@ -605,7 +647,12 @@ export default function App() {
           <span className="text-base font-bold tracking-widest text-gray-400 uppercase">
             {t.totalObserved}
           </span>
-          <span className="mono text-2xl font-medium text-white">{total}</span>
+          <div className="flex items-center gap-3">
+            {comboCount >= 2 && (
+              <span className="combo-pill combo-active">🔥 {comboCount}×</span>
+            )}
+            <span className="mono text-2xl font-medium text-white">{total}</span>
+          </div>
         </div>
 
         {/* Count Buttons — two gender columns */}
@@ -781,20 +828,29 @@ export default function App() {
             const gTotal = gMale + gFemale + gMalePhone + gFemalePhone;
             const gTotalMale = gMale + gMalePhone;
             const gTotalFemale = gFemale + gFemalePhone;
+            const gMaxCombo = measurements.reduce(
+              (max, m) => Math.max(max, m.longestCombo ?? 0),
+              0
+            );
             const locale = lang === 'it' ? 'it-IT' : 'en-US';
             return (
               <div>
                 {/* Global aggregated stats */}
                 <div className="stat-card mb-4">
-                  <div className="mb-3 flex items-center gap-2 text-xs tracking-widest text-gray-500 uppercase">
-                    <ChartPieIcon
-                      style={{
-                        width: '0.875rem',
-                        height: '0.875rem',
-                        color: '#4b5563',
-                      }}
-                    />
-                    {t.allTimeTotals(measurements.length)}
+                  <div className="mb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs tracking-widest text-gray-500 uppercase">
+                      <ChartPieIcon
+                        style={{
+                          width: '0.875rem',
+                          height: '0.875rem',
+                          color: '#4b5563',
+                        }}
+                      />
+                      {t.allTimeTotals(measurements.length)}
+                    </div>
+                    {gMaxCombo >= 2 && (
+                      <span className="combo-pill combo-active" style={{ fontSize: '0.65rem', padding: '1px 7px' }}>🔥 {gMaxCombo}×</span>
+                    )}
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <div className="stat-card text-center">
@@ -927,6 +983,9 @@ export default function App() {
                               </span>
                             </span>
                           </div>
+                          {(m.longestCombo ?? 0) >= 2 && (
+                            <span className="combo-pill combo-active" style={{ fontSize: '0.65rem', padding: '1px 7px' }}>🔥 {m.longestCombo}×</span>
+                          )}
                           <div className="ml-auto text-xs text-gray-500">
                             {tot} {t.observed}
                           </div>

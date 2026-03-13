@@ -1168,12 +1168,12 @@ export default function App() {
 
     <footer className="pb-4 text-center text-xs text-gray-600">
       <a
-        href="https://github.com/geremia/instacrash"
+        href="https://github.com/tagliala-labs/instacrash"
         target="_blank"
         rel="noopener noreferrer"
         className="transition-colors hover:text-gray-400"
       >
-        github.com/geremia/instacrash
+        github.com/tagliala-labs/instacrash
       </a>
     </footer>
   </>

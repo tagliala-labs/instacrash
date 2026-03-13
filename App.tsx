@@ -11,6 +11,7 @@ import {
   PersonDressIcon,
   PersonIcon,
   PlayIcon,
+  RotateLeftIcon,
   XMarkIcon,
 } from './icons';
 
@@ -441,7 +442,7 @@ export default function App() {
               }}
               title="Undo last entry"
             >
-              <span>↩</span>
+              <RotateLeftIcon style={{ width: '1em', height: '1em' }} />
             </button>
             <button
               className={`ctrl-btn flex-1 ${startPauseBtnClass}`}

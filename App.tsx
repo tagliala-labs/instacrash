@@ -15,6 +15,7 @@ import {
   PersonIcon,
   PlayIcon,
   RotateLeftIcon,
+  TrashIcon,
   XMarkIcon,
 } from './icons';
 
@@ -45,6 +46,134 @@ const EMPTY_COUNTS: Counts = {
   female: 0,
   malePhone: 0,
   femalePhone: 0,
+};
+
+// ── i18n ──────────────────────────────────────────────────────────────────
+const LANG_KEY = 'instacrash-lang';
+type Lang = 'en' | 'it';
+
+function detectLang(): Lang {
+  try {
+    const s = localStorage.getItem(LANG_KEY);
+    if (s === 'en' || s === 'it') return s;
+  } catch {}
+  return (navigator.language ?? '').toLowerCase().startsWith('it') ? 'it' : 'en';
+}
+
+const T: Record<
+  Lang,
+  {
+    tagline: string;
+    totalObserved: string;
+    start: string;
+    pause: string;
+    resume: string;
+    idle: string;
+    running: string;
+    paused: string;
+    undoTitle: string;
+    endTitle: string;
+    maleDriver: string;
+    femaleDriver: string;
+    liveBreakdown: string;
+    maleInfraction: string;
+    femaleInfraction: string;
+    noInfraction: string;
+    totalMaleRate: string;
+    totalFemaleRate: string;
+    allTimeTotals: (n: number) => string;
+    maleRate: string;
+    femaleRate: string;
+    overall: string;
+    pastMeasurements: string;
+    measurement: (n: number) => string;
+    infractionRate: string;
+    observed: string;
+    measurementResults: string;
+    duration: string;
+    malePhone: string;
+    femalePhone: string;
+    deleteMeasurement: string;
+    deleteConfirmTitle: string;
+    deleteConfirmBody: string;
+    cancel: string;
+    delete: string;
+  }
+> = {
+  en: {
+    tagline: 'Follow people texting while driving',
+    totalObserved: 'Total observed',
+    start: 'Start',
+    pause: 'Pause',
+    resume: 'Resume',
+    idle: 'Idle',
+    running: 'Running',
+    paused: 'Paused',
+    undoTitle: 'Undo last entry',
+    endTitle: 'End session',
+    maleDriver: 'Male driver',
+    femaleDriver: 'Female driver',
+    liveBreakdown: 'Live infraction breakdown',
+    maleInfraction: 'Male infraction',
+    femaleInfraction: 'Female infraction',
+    noInfraction: 'No infraction',
+    totalMaleRate: 'Total male infraction rate',
+    totalFemaleRate: 'Total female infraction rate',
+    allTimeTotals: (n) => `All-time totals · ${n} session${n !== 1 ? 's' : ''}`,
+    maleRate: 'Male rate',
+    femaleRate: 'Female rate',
+    overall: 'Overall',
+    pastMeasurements: 'Past measurements',
+    measurement: (n) => `Measurement #${n}`,
+    infractionRate: 'infraction rate',
+    observed: 'observed',
+    measurementResults: 'Measurement Results',
+    duration: 'duration',
+    malePhone: 'Male + Phone',
+    femalePhone: 'Female + Phone',
+    deleteMeasurement: 'Delete measurement',
+    deleteConfirmTitle: 'Delete this measurement?',
+    deleteConfirmBody: 'This action cannot be undone.',
+    cancel: 'Cancel',
+    delete: 'Delete',
+  },
+  it: {
+    tagline: 'Segui chi usa il telefono alla guida',
+    totalObserved: 'Totale osservati',
+    start: 'Inizia',
+    pause: 'Pausa',
+    resume: 'Riprendi',
+    idle: 'Inattivo',
+    running: 'In corso',
+    paused: 'In pausa',
+    undoTitle: 'Annulla ultima voce',
+    endTitle: 'Termina sessione',
+    maleDriver: 'Autista uomo',
+    femaleDriver: 'Autista donna',
+    liveBreakdown: 'Infrazioni in tempo reale',
+    maleInfraction: 'Infrazione uomo',
+    femaleInfraction: 'Infrazione donna',
+    noInfraction: 'Nessuna infrazione',
+    totalMaleRate: 'Tasso infrazione uomini',
+    totalFemaleRate: 'Tasso infrazione donne',
+    allTimeTotals: (n) => `Totali · ${n} session${n !== 1 ? 'i' : 'e'}`,
+    maleRate: 'Tasso uomini',
+    femaleRate: 'Tasso donne',
+    overall: 'Totale',
+    pastMeasurements: 'Misurazioni passate',
+    measurement: (n) => `Misurazione #${n}`,
+    infractionRate: 'tasso infrazione',
+    observed: 'osservati',
+    measurementResults: 'Risultati misurazione',
+    duration: 'durata',
+    malePhone: 'Uomo + Telefono',
+    femalePhone: 'Donna + Telefono',
+    deleteMeasurement: 'Elimina misurazione',
+    deleteConfirmTitle: 'Eliminare questa misurazione?',
+    deleteConfirmBody: "L'azione non può essere annullata.",
+    cancel: 'Annulla',
+    delete: 'Elimina',
+  },
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -85,6 +214,8 @@ export default function App() {
   const [sirenActive, setSirenActive] = useState(false);
   const [selectedMeasurement, setSelectedMeasurement] =
     useState<Measurement | null>(null);
+  const [lang, setLang] = useState<Lang>(detectLang);
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
 
   // Refs for values used inside callbacks without causing re-renders
   const elapsedRef = useRef(0);
@@ -328,6 +459,16 @@ export default function App() {
     spawnFloatingEmoji('😅', 2);
   }
 
+  function toggleLang() {
+    setLang((l) => {
+      const next: Lang = l === 'en' ? 'it' : 'en';
+      try {
+        localStorage.setItem(LANG_KEY, next);
+      } catch {}
+      return next;
+    });
+  }
+
   function bumpAnim(type: string) {
     const btn = btnRefs.current[type];
     if (!btn) return;
@@ -351,6 +492,7 @@ export default function App() {
   }
 
   // Derived values
+  const t = T[lang];
   const { male, female, malePhone, femalePhone } = counts;
   const total = male + female + malePhone + femalePhone;
   const totalMale = male + malePhone;
@@ -366,7 +508,7 @@ export default function App() {
         : 'ctrl-resume';
 
   const startPauseLabel =
-    appState === 'idle' ? 'Start' : appState === 'running' ? 'Pause' : 'Resume';
+    appState === 'idle' ? t.start : appState === 'running' ? t.pause : t.resume;
 
   const statusPillClass =
     appState === 'idle'
@@ -376,13 +518,10 @@ export default function App() {
         : 'status-paused';
 
   const statusLabel =
-    appState === 'idle'
-      ? 'Idle'
-      : appState === 'running'
-        ? 'Running'
-        : 'Paused';
+    appState === 'idle' ? t.idle : appState === 'running' ? t.running : t.paused;
 
   return (
+    <>
     <div
       className="min-h-screen p-4 pb-8"
       style={{ background: 'var(--bg)', color: 'var(--text)' }}
@@ -392,7 +531,13 @@ export default function App() {
 
       <div className="mx-auto max-w-lg">
         {/* Header */}
-        <div className="pt-2 pb-3 text-center">
+        <div className="relative pt-2 pb-3 text-center">
+          <button
+            onClick={toggleLang}
+            className="absolute right-0 top-3 rounded px-2 py-1 text-xs font-semibold tracking-widest text-gray-500 uppercase transition-colors hover:text-white"
+          >
+            {lang === 'en' ? 'IT' : 'EN'}
+          </button>
           <div className="mb-1 flex items-center justify-center gap-3">
             <MobileScreenButtonIcon
               className="text-red-400"
@@ -410,30 +555,18 @@ export default function App() {
             />
           </div>
           <p className="text-sm tracking-wider text-gray-500 uppercase">
-            Follow people texting while driving
+            {t.tagline}
           </p>
         </div>
 
         {/* Control Panel */}
         <div className="stat-card mb-4">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <div className="timer-display">{displayTime}</div>
-              <div className="mt-1">
-                <span className={`status-pill ${statusPillClass}`}>
-                  <span className="status-dot" />
-                  <span>{statusLabel}</span>
-                </span>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="mb-1 text-xs tracking-widest text-gray-500 uppercase">
-                Total observed
-              </div>
-              <div className="mono text-4xl font-medium text-white">
-                {total}
-              </div>
-            </div>
+          <div className="mb-4 flex items-center gap-3">
+            <div className="timer-display">{displayTime}</div>
+            <span className={`status-pill ${statusPillClass}`}>
+              <span className="status-dot" />
+              <span>{statusLabel}</span>
+            </span>
           </div>
 
           <div className="flex items-center gap-3">
@@ -443,7 +576,7 @@ export default function App() {
               style={{
                 visibility: isActive && total > 0 ? 'visible' : 'hidden',
               }}
-              title="Undo last entry"
+              title={t.undoTitle}
             >
               <RotateLeftIcon style={{ width: '1em', height: '1em' }} />
             </button>
@@ -462,11 +595,19 @@ export default function App() {
               className="ctrl-btn ctrl-end ctrl-side"
               onClick={handleEnd}
               style={{ visibility: isActive ? 'visible' : 'hidden' }}
-              title="End session"
+              title={t.endTitle}
             >
               <CheckeredFlagIcon style={{ width: '1em', height: '1em' }} />
             </button>
           </div>
+        </div>
+
+        {/* Total observed */}
+        <div className="stat-card mb-4 flex items-center justify-between">
+          <span className="text-xs tracking-widest text-gray-500 uppercase">
+            {t.totalObserved}
+          </span>
+          <span className="mono text-4xl font-medium text-white">{total}</span>
         </div>
 
         {/* Count Buttons — two gender columns */}
@@ -491,7 +632,7 @@ export default function App() {
             </button>
             <div className="col-gender-header col-male-header">
               <PersonIcon style={{ width: '1.4rem', height: '1.4rem' }} />
-              <span>Male driver</span>
+              <span>{t.maleDriver}</span>
             </div>
             <button
               ref={(el) => {
@@ -533,7 +674,7 @@ export default function App() {
             </button>
             <div className="col-gender-header col-female-header">
               <PersonDressIcon style={{ width: '1.4rem', height: '1.4rem' }} />
-              <span>Female driver</span>
+              <span>{t.femaleDriver}</span>
             </div>
             <button
               ref={(el) => {
@@ -566,7 +707,7 @@ export default function App() {
                 color: '#4b5563',
               }}
             />
-            Live infraction breakdown
+            {t.liveBreakdown}
           </div>
           <div className="flex items-center gap-4">
             <div style={{ width: 140, height: 140, flexShrink: 0 }}>
@@ -578,7 +719,7 @@ export default function App() {
                   className="legend-dot"
                   style={{ background: '#2563eb' }}
                 />
-                <span className="text-gray-400">Male infraction</span>
+                <span className="text-gray-400">{t.maleInfraction}</span>
                 <span className="mono ml-auto font-medium text-blue-400">
                   {total ? `${pct(malePhone, total)}%` : '—'}
                 </span>
@@ -588,7 +729,7 @@ export default function App() {
                   className="legend-dot"
                   style={{ background: '#db2777' }}
                 />
-                <span className="text-gray-400">Female infraction</span>
+                <span className="text-gray-400">{t.femaleInfraction}</span>
                 <span className="mono ml-auto font-medium text-pink-400">
                   {total ? `${pct(femalePhone, total)}%` : '—'}
                 </span>
@@ -599,7 +740,7 @@ export default function App() {
                   className="legend-dot"
                   style={{ background: '#6b7280' }}
                 />
-                <span className="text-gray-400">No infraction</span>
+                <span className="text-gray-400">{t.noInfraction}</span>
                 <span className="mono ml-auto font-medium text-gray-400">
                   {total ? `${pct(male + female, total)}%` : '—'}
                 </span>
@@ -607,13 +748,13 @@ export default function App() {
               <hr className="divider my-2" />
               <div className="space-y-1 text-xs text-gray-500">
                 <div className="flex justify-between">
-                  <span>Total male infraction rate</span>
+                  <span>{t.totalMaleRate}</span>
                   <span className="mono text-blue-400">
                     {totalMale ? `${pct(malePhone, totalMale)}%` : '—'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Total female infraction rate</span>
+                  <span>{t.totalFemaleRate}</span>
                   <span className="mono text-pink-400">
                     {totalFemale ? `${pct(femalePhone, totalFemale)}%` : '—'}
                   </span>
@@ -624,144 +765,184 @@ export default function App() {
         </div>
 
         {/* History */}
-        {measurements.length > 0 && (() => {
-          const gMale = measurements.reduce((s, m) => s + m.counts.male, 0);
-          const gFemale = measurements.reduce((s, m) => s + m.counts.female, 0);
-          const gMalePhone = measurements.reduce((s, m) => s + m.counts.malePhone, 0);
-          const gFemalePhone = measurements.reduce((s, m) => s + m.counts.femalePhone, 0);
-          const gTotal = gMale + gFemale + gMalePhone + gFemalePhone;
-          const gTotalMale = gMale + gMalePhone;
-          const gTotalFemale = gFemale + gFemalePhone;
-          return (
-            <div>
-              {/* Global aggregated stats */}
-              <div className="stat-card mb-4">
-                <div className="mb-3 flex items-center gap-2 text-xs tracking-widest text-gray-500 uppercase">
-                  <ChartPieIcon style={{ width: '0.875rem', height: '0.875rem', color: '#4b5563' }} />
-                  All-time totals · {measurements.length} session{measurements.length !== 1 ? 's' : ''}
-                </div>
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="stat-card text-center">
-                    <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">Male rate</div>
-                    <div className="mono text-2xl text-blue-400">
-                      {gTotalMale ? pct(gMalePhone, gTotalMale) : 0}%
-                    </div>
-                    <div className="mt-1 text-xs text-gray-600">{gMalePhone}/{gTotalMale}</div>
-                  </div>
-                  <div className="stat-card text-center">
-                    <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">Female rate</div>
-                    <div className="mono text-2xl text-pink-400">
-                      {gTotalFemale ? pct(gFemalePhone, gTotalFemale) : 0}%
-                    </div>
-                    <div className="mt-1 text-xs text-gray-600">{gFemalePhone}/{gTotalFemale}</div>
-                  </div>
-                  <div className="stat-card text-center">
-                    <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">Overall</div>
-                    <div className="mono text-2xl text-white">
-                      {gTotal ? pct(gMalePhone + gFemalePhone, gTotal) : 0}%
-                    </div>
-                    <div className="mt-1 text-xs text-gray-600">{gMalePhone + gFemalePhone}/{gTotal}</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mb-3 flex items-center gap-2 text-xs tracking-widest text-gray-500 uppercase">
-                <ClockRotateLeftIcon
-                  style={{ width: '0.875rem', height: '0.875rem', color: '#4b5563' }}
-                />
-                Past measurements
-              </div>
-              <div className="space-y-2">
-                {measurements.map((m, i) => {
-                  const c = m.counts;
-                  const tot = c.male + c.female + c.malePhone + c.femalePhone;
-                  const infrPct = tot ? pct(c.malePhone + c.femalePhone, tot) : 0;
-                  const d = new Date(m.date);
-                  const dateStr = d.toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: 'numeric',
-                  });
-                  const timeStr = d.toLocaleTimeString(undefined, {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  });
-                  const rateColor =
-                    infrPct > 50
-                      ? 'text-red-400'
-                      : infrPct > 20
-                        ? 'text-amber-400'
-                        : 'text-green-400';
-                  return (
-                    <div
-                      key={m.id}
-                      className="history-item"
-                      onClick={() => setSelectedMeasurement(m)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ')
-                          setSelectedMeasurement(m);
+        {measurements.length > 0 &&
+          (() => {
+            const gMale = measurements.reduce((s, m) => s + m.counts.male, 0);
+            const gFemale = measurements.reduce(
+              (s, m) => s + m.counts.female,
+              0
+            );
+            const gMalePhone = measurements.reduce(
+              (s, m) => s + m.counts.malePhone,
+              0
+            );
+            const gFemalePhone = measurements.reduce(
+              (s, m) => s + m.counts.femalePhone,
+              0
+            );
+            const gTotal = gMale + gFemale + gMalePhone + gFemalePhone;
+            const gTotalMale = gMale + gMalePhone;
+            const gTotalFemale = gFemale + gFemalePhone;
+            const locale = lang === 'it' ? 'it-IT' : 'en-US';
+            return (
+              <div>
+                {/* Global aggregated stats */}
+                <div className="stat-card mb-4">
+                  <div className="mb-3 flex items-center gap-2 text-xs tracking-widest text-gray-500 uppercase">
+                    <ChartPieIcon
+                      style={{
+                        width: '0.875rem',
+                        height: '0.875rem',
+                        color: '#4b5563',
                       }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-semibold tracking-wide text-white">
-                            Measurement #{measurements.length - i}
+                    />
+                    {t.allTimeTotals(measurements.length)}
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="stat-card text-center">
+                      <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
+                        {t.maleRate}
+                      </div>
+                      <div className="mono text-2xl text-blue-400">
+                        {gTotalMale ? pct(gMalePhone, gTotalMale) : 0}%
+                      </div>
+                      <div className="mt-1 text-xs text-gray-600">
+                        {gMalePhone}/{gTotalMale}
+                      </div>
+                    </div>
+                    <div className="stat-card text-center">
+                      <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
+                        {t.femaleRate}
+                      </div>
+                      <div className="mono text-2xl text-pink-400">
+                        {gTotalFemale ? pct(gFemalePhone, gTotalFemale) : 0}%
+                      </div>
+                      <div className="mt-1 text-xs text-gray-600">
+                        {gFemalePhone}/{gTotalFemale}
+                      </div>
+                    </div>
+                    <div className="stat-card text-center">
+                      <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
+                        {t.overall}
+                      </div>
+                      <div className="mono text-2xl text-white">
+                        {gTotal ? pct(gMalePhone + gFemalePhone, gTotal) : 0}%
+                      </div>
+                      <div className="mt-1 text-xs text-gray-600">
+                        {gMalePhone + gFemalePhone}/{gTotal}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-3 flex items-center gap-2 text-xs tracking-widest text-gray-500 uppercase">
+                  <ClockRotateLeftIcon
+                    style={{
+                      width: '0.875rem',
+                      height: '0.875rem',
+                      color: '#4b5563',
+                    }}
+                  />
+                  {t.pastMeasurements}
+                </div>
+                <div className="space-y-2">
+                  {measurements.map((m, i) => {
+                    const c = m.counts;
+                    const tot =
+                      c.male + c.female + c.malePhone + c.femalePhone;
+                    const infrPct = tot
+                      ? pct(c.malePhone + c.femalePhone, tot)
+                      : 0;
+                    const d = new Date(m.date);
+                    const dateStr = d.toLocaleDateString(locale, {
+                      month: 'short',
+                      day: 'numeric',
+                    });
+                    const timeStr = d.toLocaleTimeString(locale, {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    });
+                    const rateColor =
+                      infrPct > 50
+                        ? 'text-red-400'
+                        : infrPct > 20
+                          ? 'text-amber-400'
+                          : 'text-green-400';
+                    return (
+                      <div
+                        key={m.id}
+                        className="history-item"
+                        onClick={() => setSelectedMeasurement(m)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ')
+                            setSelectedMeasurement(m);
+                        }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-semibold tracking-wide text-white">
+                              {t.measurement(measurements.length - i)}
+                            </div>
+                            <div className="mono mt-0.5 text-xs text-gray-500">
+                              {dateStr} · {timeStr} · {formatTime(m.duration)}
+                            </div>
                           </div>
-                          <div className="mono mt-0.5 text-xs text-gray-500">
-                            {dateStr} · {timeStr} · {formatTime(m.duration)}
+                          <div className="text-right">
+                            <div
+                              className={`mono text-lg font-medium ${rateColor}`}
+                            >
+                              {infrPct}%
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {t.infractionRate}
+                            </div>
                           </div>
-                        </div>
-                        <div className="text-right">
-                          <div className={`mono text-lg font-medium ${rateColor}`}>
-                            {infrPct}%
-                          </div>
-                          <div className="text-xs text-gray-500">infraction rate</div>
-                        </div>
-                        <div className="ml-3 flex items-center gap-2">
-                          <button
-                            className="text-gray-600 transition-colors hover:text-red-400"
-                            title="Delete measurement"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setMeasurements((prev) => prev.filter((x) => x.id !== m.id));
-                            }}
-                          >
-                            <XMarkIcon style={{ width: '1rem', height: '1rem' }} />
-                          </button>
                           <ChevronRightIcon
-                            className="text-gray-600"
+                            className="ml-3 text-gray-600"
                             style={{ width: '0.75rem', height: '0.75rem' }}
                           />
                         </div>
-                      </div>
-                      <div className="mt-3 flex gap-3">
-                        <div className="flex items-center gap-1.5 text-xs">
-                          <span className="h-2 w-2 rounded-full" style={{ background: '#2563eb' }} />
-                          <span className="text-gray-400">
-                            {c.male}{' '}
-                            <span className="text-blue-400">+{c.malePhone}📱</span>
-                          </span>
+                        <div className="mt-3 flex gap-3">
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <span
+                              className="h-2 w-2 rounded-full"
+                              style={{ background: '#2563eb' }}
+                            />
+                            <span className="text-gray-400">
+                              {c.male}{' '}
+                              <span className="text-blue-400">
+                                +{c.malePhone}📱
+                              </span>
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <span
+                              className="h-2 w-2 rounded-full"
+                              style={{ background: '#db2777' }}
+                            />
+                            <span className="text-gray-400">
+                              {c.female}{' '}
+                              <span className="text-pink-400">
+                                +{c.femalePhone}📱
+                              </span>
+                            </span>
+                          </div>
+                          <div className="ml-auto text-xs text-gray-500">
+                            {tot} {t.observed}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-1.5 text-xs">
-                          <span className="h-2 w-2 rounded-full" style={{ background: '#db2777' }} />
-                          <span className="text-gray-400">
-                            {c.female}{' '}
-                            <span className="text-pink-400">+{c.femalePhone}📱</span>
-                          </span>
-                        </div>
-                        <div className="ml-auto text-xs text-gray-500">{tot} observed</div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          );
-        })()}
+            );
+          })()}
       </div>
 
-      {/* Modal */}
+      {/* Detail modal */}
       {selectedMeasurement && (
         <div
           className="modal-bg"
@@ -778,19 +959,19 @@ export default function App() {
             </button>
             <div className="mb-4 pr-8">
               <h2 className="text-xl font-bold tracking-wide text-white">
-                Measurement Results
+                {t.measurementResults}
               </h2>
               <p className="mono mt-0.5 text-xs text-gray-500">
                 {new Date(selectedMeasurement.date).toLocaleDateString(
-                  undefined,
+                  lang === 'it' ? 'it-IT' : 'en-US',
                   { weekday: 'long', month: 'long', day: 'numeric' }
                 )}{' '}
-                · {formatTime(selectedMeasurement.duration)} duration ·{' '}
+                · {formatTime(selectedMeasurement.duration)} {t.duration} ·{' '}
                 {selectedMeasurement.counts.male +
                   selectedMeasurement.counts.female +
                   selectedMeasurement.counts.malePhone +
                   selectedMeasurement.counts.femalePhone}{' '}
-                observed
+                {t.observed}
               </p>
             </div>
 
@@ -805,13 +986,13 @@ export default function App() {
               const totMale = c.male + c.malePhone;
               const totFemale = c.female + c.femalePhone;
               const legendRows = [
-                { color: '#2563eb', label: 'Male + Phone', value: c.malePhone },
+                { color: '#2563eb', label: t.malePhone, value: c.malePhone },
                 {
                   color: '#db2777',
-                  label: 'Female + Phone',
+                  label: t.femalePhone,
                   value: c.femalePhone,
                 },
-                { color: '#374151', label: 'No infraction', value: noInfr },
+                { color: '#374151', label: t.noInfraction, value: noInfr },
               ];
               return (
                 <>
@@ -840,7 +1021,7 @@ export default function App() {
                   <div className="grid grid-cols-3 gap-3">
                     <div className="stat-card text-center">
                       <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
-                        Male rate
+                        {t.maleRate}
                       </div>
                       <div className="mono text-2xl text-blue-400">
                         {totMale ? pct(c.malePhone, totMale) : 0}%
@@ -851,7 +1032,7 @@ export default function App() {
                     </div>
                     <div className="stat-card text-center">
                       <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
-                        Female rate
+                        {t.femaleRate}
                       </div>
                       <div className="mono text-2xl text-pink-400">
                         {totFemale ? pct(c.femalePhone, totFemale) : 0}%
@@ -862,7 +1043,7 @@ export default function App() {
                     </div>
                     <div className="stat-card text-center">
                       <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
-                        Overall
+                        {t.overall}
                       </div>
                       <div className="mono text-2xl text-white">
                         {tot ? pct(c.malePhone + c.femalePhone, tot) : 0}%
@@ -872,12 +1053,72 @@ export default function App() {
                       </div>
                     </div>
                   </div>
+                  <hr className="divider mt-4 mb-1" />
+                  <button
+                    className="flex w-full items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium text-red-500 transition-colors hover:bg-red-950 hover:text-red-400"
+                    onClick={() => setPendingDeleteId(selectedMeasurement.id)}
+                  >
+                    <TrashIcon
+                      style={{ width: '0.8rem', height: '0.8rem' }}
+                    />
+                    {t.deleteMeasurement}
+                  </button>
                 </>
               );
             })()}
           </div>
         </div>
       )}
+
+      {/* Confirm delete modal */}
+      {pendingDeleteId !== null && (
+        <div
+          className="modal-bg"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setPendingDeleteId(null);
+          }}
+        >
+          <div className="modal-card" style={{ maxWidth: 360 }}>
+            <h2 className="mb-2 text-lg font-bold text-white">
+              {t.deleteConfirmTitle}
+            </h2>
+            <p className="mb-5 text-sm text-gray-400">{t.deleteConfirmBody}</p>
+            <div className="flex gap-3">
+              <button
+                className="ctrl-btn ctrl-undo flex-1"
+                onClick={() => setPendingDeleteId(null)}
+              >
+                {t.cancel}
+              </button>
+              <button
+                className="ctrl-btn ctrl-end flex-1"
+                onClick={() => {
+                  setMeasurements((prev) =>
+                    prev.filter((x) => x.id !== pendingDeleteId)
+                  );
+                  if (selectedMeasurement?.id === pendingDeleteId)
+                    setSelectedMeasurement(null);
+                  setPendingDeleteId(null);
+                }}
+              >
+                {t.delete}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+
+    <footer className="pb-4 text-center text-xs text-gray-600">
+      <a
+        href="https://github.com/geremia/instacrash"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="transition-colors hover:text-gray-400"
+      >
+        github.com/geremia/instacrash
+      </a>
+    </footer>
+  </>
   );
 }

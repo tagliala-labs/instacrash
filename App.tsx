@@ -165,11 +165,25 @@ function playUndoSound() {
 
 function playSirenSound(direction: 'ltr' | 'rtl') {
   const ctx = getAudioCtx();
-  // Sync with animation: 0.25s delay + 0.14s for the car to appear (5% of 2.8s)
-  const t = ctx.currentTime + 0.39;
-  const dur = 2.3; // covers on-screen portion of the 2.8s animation
+  // Start 80ms after button press: lights just flashed, car still offscreen.
+  const t0 = ctx.currentTime + 0.08;
+
+  // Keyframe offsets from t0 — derived from CSS animation physics:
+  //   CSS: 0.25s delay, 2.8s duration, linear. Siren lead = 0.08s → anim offset = 0.17s.
+  //   Velocities: entry 58.8 vw/s → braking ~18 vw/s → stop ~4 vw/s → accel 58 vw/s → exit 140 vw/s
+  const K = {
+    enter:   0.31,  // 5% car appears, fast approach 58.8 vw/s
+    fastEnd: 0.79,  // 22% fast entry ends, car at 28vw
+    brake:   1.18,  // 36% braking, 36vw
+    stop:    1.68,  // 54% almost stopped, 39vw — clearly before center
+    pass:    1.87,  // center crossing ~50vw at 58 vw/s (accelerating)
+    accel:   2.13,  // 70% acceleration peak, 65vw
+    exit:    2.52,  // 84% abrupt exit
+    end:     2.72,
+  };
 
   // Signal chain: osc → lpf → masterGain → panner → destination
+  //                      lfo → lfoGain → osc.frequency (modulation)
   const panner = ctx.createStereoPanner();
   panner.connect(ctx.destination);
 
@@ -178,43 +192,80 @@ function playSirenSound(direction: 'ltr' | 'rtl') {
 
   const lpf = ctx.createBiquadFilter();
   lpf.type = 'lowpass';
-  lpf.frequency.value = 2400;
+  lpf.frequency.value = 2100;
+  lpf.Q.value = 0.6;
   lpf.connect(masterGain);
 
   const osc = ctx.createOscillator();
   osc.type = 'sawtooth';
   osc.connect(lpf);
 
-  // LFO → wee-woo warble: ~1.8 sweeps/s, ±130 Hz swing around base
   const lfo = ctx.createOscillator();
   lfo.type = 'sine';
-  lfo.frequency.value = 1.8;
   const lfoGain = ctx.createGain();
-  lfoGain.gain.value = 130;
   lfo.connect(lfoGain);
   lfoGain.connect(osc.frequency);
 
-  // Doppler: base pitch high while approaching, sharp drop as it passes, low while receding
-  const passT = t + dur * 0.52; // the car crosses center slightly after midpoint
-  osc.frequency.setValueAtTime(840, t);
-  osc.frequency.linearRampToValueAtTime(870, passT - 0.15); // creeps up as it nears
-  osc.frequency.linearRampToValueAtTime(530, passT + 0.25); // sharp Doppler drop
-  osc.frequency.linearRampToValueAtTime(460, t + dur);      // fades away low
+  // ─ BASE PITCH: exaggerated Doppler (±28%) around 700 Hz emission ───────
+  // fast approach (58.8 vw/s) → ×1.25 = 875 Hz
+  // braking    (18  vw/s  )   → ×1.08 = 756 Hz
+  // almost stopped (~4 vw/s ) → ×1.01 = 707 Hz  (near-zero Doppler)
+  // center flip, accelerating → drops to 578 Hz  (fast recession)
+  // exit       (140 vw/s  )   → ×0.62 = 434 Hz
+  osc.frequency.setValueAtTime(800, t0);
+  osc.frequency.linearRampToValueAtTime(875, t0 + K.enter);
+  osc.frequency.linearRampToValueAtTime(756, t0 + K.brake);
+  osc.frequency.linearRampToValueAtTime(714, t0 + K.stop);
+  osc.frequency.linearRampToValueAtTime(704, t0 + K.stop + 0.12); // zero-velocity moment
+  osc.frequency.linearRampToValueAtTime(578, t0 + K.pass + 0.12); // Doppler drop
+  osc.frequency.linearRampToValueAtTime(510, t0 + K.accel);
+  osc.frequency.linearRampToValueAtTime(434, t0 + K.exit);        // 140 vw/s recession
+  osc.frequency.linearRampToValueAtTime(390, t0 + K.end);
 
-  // Stereo pan follows the car across the screen
-  const p0 = direction === 'ltr' ? -0.9 : 0.9;
-  const p1 = direction === 'ltr' ?  0.9 : -0.9;
-  panner.pan.setValueAtTime(p0, t);
-  panner.pan.linearRampToValueAtTime(p1, t + dur);
+  // ─ LFO RATE: sweep cycle is Doppler-compressed approaching, stretched receding ─
+  lfo.frequency.setValueAtTime(2.10, t0);
+  lfo.frequency.linearRampToValueAtTime(2.25, t0 + K.enter);   // fast approach
+  lfo.frequency.linearRampToValueAtTime(1.92, t0 + K.brake);
+  lfo.frequency.linearRampToValueAtTime(1.78, t0 + K.stop);    // near-static
+  lfo.frequency.linearRampToValueAtTime(1.50, t0 + K.accel);   // receding
+  lfo.frequency.linearRampToValueAtTime(1.22, t0 + K.end);
 
-  // Volume envelope: fade in fast, hold, fade out at the end
-  masterGain.gain.setValueAtTime(0, t);
-  masterGain.gain.linearRampToValueAtTime(0.2, t + 0.22);
-  masterGain.gain.setValueAtTime(0.2, t + dur - 0.3);
-  masterGain.gain.linearRampToValueAtTime(0, t + dur);
+  // ─ LFO SWING: proportional to velocity (faster = wider wee–woo arc) ───
+  lfoGain.gain.setValueAtTime(115, t0);
+  lfoGain.gain.linearRampToValueAtTime(155, t0 + K.enter);     // fast = wide
+  lfoGain.gain.linearRampToValueAtTime(100, t0 + K.brake);
+  lfoGain.gain.linearRampToValueAtTime(55,  t0 + K.stop);      // near-zero = narrow
+  lfoGain.gain.linearRampToValueAtTime(55,  t0 + K.pass);
+  lfoGain.gain.linearRampToValueAtTime(115, t0 + K.accel);     // accelerating again
+  lfoGain.gain.linearRampToValueAtTime(145, t0 + K.exit);      // fast exit
+  lfoGain.gain.linearRampToValueAtTime(70,  t0 + K.end);
 
-  lfo.start(t);  lfo.stop(t + dur);
-  osc.start(t);  osc.stop(t + dur);
+  // ─ STEREO PAN: mapped from exact car position ──────────────────────
+  // pan(vw) = (vw − 50) / 62  — negative = left, positive = right
+  // LTR: -0.9 → 0 → +0.9  |  RTL: mirrored
+  const sgn = direction === 'ltr' ? 1 : -1;
+  panner.pan.setValueAtTime(-0.90 * sgn, t0);
+  panner.pan.linearRampToValueAtTime(-0.85 * sgn, t0 + K.enter);
+  panner.pan.linearRampToValueAtTime(-0.37 * sgn, t0 + K.fastEnd); // 28vw
+  panner.pan.linearRampToValueAtTime(-0.23 * sgn, t0 + K.brake);   // 36vw
+  panner.pan.linearRampToValueAtTime(-0.18 * sgn, t0 + K.stop);    // 39vw
+  panner.pan.linearRampToValueAtTime( 0,           t0 + K.pass);    // 50vw center
+  panner.pan.linearRampToValueAtTime( 0.25 * sgn, t0 + K.accel);   // 65vw
+  panner.pan.linearRampToValueAtTime( 0.90 * sgn, t0 + K.exit);
+
+  // ─ VOLUME: inverse distance from center + envelope ─────────────────
+  // Loudest when car is nearest (at K.pass, 50vw), quieter at edges
+  masterGain.gain.setValueAtTime(0,    t0);
+  masterGain.gain.linearRampToValueAtTime(0.07, t0 + K.enter);
+  masterGain.gain.linearRampToValueAtTime(0.15, t0 + K.brake);
+  masterGain.gain.linearRampToValueAtTime(0.24, t0 + K.stop);
+  masterGain.gain.linearRampToValueAtTime(0.28, t0 + K.pass);    // closest
+  masterGain.gain.linearRampToValueAtTime(0.18, t0 + K.accel);
+  masterGain.gain.linearRampToValueAtTime(0.08, t0 + K.exit);
+  masterGain.gain.linearRampToValueAtTime(0,    t0 + K.end);
+
+  lfo.start(t0); lfo.stop(t0 + K.end + 0.05);
+  osc.start(t0); osc.stop(t0 + K.end + 0.05);
 }
 
 const T: Record<

@@ -587,11 +587,9 @@ body {
 
 /* ── Police car ──────────────────────────────────────────────────────── */
 /*
-  Velocity phases (linear timing, position-controlled):
-    fast entry → braking (nose dips) → almost stop → accelerate (nose lifts) → abrupt exit
-  Rotation convention:
-    LTR (scaleX(-1)): rotateZ(neg) = visual CW = right/front dips; rotateZ(pos) = front lifts
-    RTL (no scale):   rotateZ(neg) = CCW = left/front dips;         rotateZ(pos) = front lifts
+  Phases (linear, position-controlled):
+    fast entry → braking before center (39vw) → accelerate THROUGH center → abrupt exit
+  Rotation: -deg = front dips (braking)  +deg = front lifts (acceleration)
 */
 
 /* Male: flipped (faces right), left → right */
@@ -599,10 +597,10 @@ body {
   0%   { transform: translateX(-120px) scaleX(-1); opacity: 0; }
   5%   { transform: translateX(-120px) scaleX(-1) rotateZ(0deg);   opacity: 1; }
   22%  { transform: translateX(28vw)   scaleX(-1) rotateZ(0deg);   opacity: 1; } /* fast entry */
-  38%  { transform: translateX(39vw)   scaleX(-1) rotateZ(-12deg); opacity: 1; } /* braking, nose dips */
-  57%  { transform: translateX(47vw)   scaleX(-1) rotateZ(-15deg); opacity: 1; } /* almost stopped */
-  72%  { transform: translateX(62vw)   scaleX(-1) rotateZ(10deg);  opacity: 1; } /* accelerating, nose lifts */
-  85%  { transform: translateX(calc(100vw + 120px)) scaleX(-1) rotateZ(0deg); opacity: 1; } /* abrupt exit */
+  36%  { transform: translateX(36vw)   scaleX(-1) rotateZ(-12deg); opacity: 1; } /* braking hard */
+  54%  { transform: translateX(39vw)   scaleX(-1) rotateZ(-14deg); opacity: 1; } /* almost stopped, before center */
+  70%  { transform: translateX(65vw)   scaleX(-1) rotateZ(10deg);  opacity: 1; } /* accelerating through center */
+  84%  { transform: translateX(calc(100vw + 120px)) scaleX(-1) rotateZ(0deg); opacity: 1; } /* abrupt exit */
   100% { transform: translateX(calc(100vw + 120px)) scaleX(-1); opacity: 0; }
 }
 
@@ -611,10 +609,10 @@ body {
   0%   { transform: translateX(calc(100vw + 120px)); opacity: 0; }
   5%   { transform: translateX(calc(100vw + 120px)) rotateZ(0deg);   opacity: 1; }
   22%  { transform: translateX(72vw)  rotateZ(0deg);   opacity: 1; } /* fast entry */
-  38%  { transform: translateX(61vw)  rotateZ(-12deg); opacity: 1; } /* braking, nose dips */
-  57%  { transform: translateX(53vw)  rotateZ(-15deg); opacity: 1; } /* almost stopped */
-  72%  { transform: translateX(38vw)  rotateZ(10deg);  opacity: 1; } /* accelerating, nose lifts */
-  85%  { transform: translateX(-120px) rotateZ(0deg);  opacity: 1; } /* abrupt exit */
+  36%  { transform: translateX(64vw)  rotateZ(-12deg); opacity: 1; } /* braking hard */
+  54%  { transform: translateX(61vw)  rotateZ(-14deg); opacity: 1; } /* almost stopped, before center */
+  70%  { transform: translateX(35vw)  rotateZ(10deg);  opacity: 1; } /* accelerating through center */
+  84%  { transform: translateX(-120px) rotateZ(0deg);  opacity: 1; } /* abrupt exit */
   100% { transform: translateX(-120px); opacity: 0; }
 }
 

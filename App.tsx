@@ -273,6 +273,23 @@ export default function App() {
     sirenTimerRef.current = setTimeout(() => setSirenActive(false), 2500);
   }
 
+  function spawnFloatingEmoji(emoji: string, count: number) {
+    const vw = window.innerWidth;
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => {
+        const el = document.createElement('span');
+        el.className = 'floating-emoji';
+        el.textContent = emoji;
+        const minX = Math.max(vw * 0.55, vw - 160);
+        el.style.left = `${minX + Math.random() * 80}px`;
+        el.style.animationDuration = `${1.4 + Math.random() * 0.8}s`;
+        el.style.fontSize = `${1.6 + Math.random() * 0.8}rem`;
+        document.body.appendChild(el);
+        el.addEventListener('animationend', () => el.remove(), { once: true });
+      }, i * 180);
+    }
+  }
+
   function register(type: keyof Counts) {
     if (appState !== 'running') return;
     const next = {
@@ -282,7 +299,12 @@ export default function App() {
     countsRef.current = next;
     setCounts(next);
     bumpAnim(type);
-    if (type === 'malePhone' || type === 'femalePhone') triggerSiren();
+    if (type === 'malePhone' || type === 'femalePhone') {
+      triggerSiren();
+      spawnFloatingEmoji('😡', 4);
+    } else {
+      spawnFloatingEmoji('😊', 3);
+    }
   }
 
   function bumpAnim(type: string) {

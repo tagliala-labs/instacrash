@@ -434,6 +434,16 @@ export default function App() {
 
           <div className="flex items-center gap-3">
             <button
+              className="ctrl-btn ctrl-undo ctrl-side"
+              onClick={handleUndo}
+              style={{
+                visibility: isActive && total > 0 ? 'visible' : 'hidden',
+              }}
+              title="Undo last entry"
+            >
+              <span>↩</span>
+            </button>
+            <button
               className={`ctrl-btn flex-1 ${startPauseBtnClass}`}
               onClick={handleStartPause}
             >
@@ -445,22 +455,12 @@ export default function App() {
               <span>{startPauseLabel}</span>
             </button>
             <button
-              className="ctrl-btn ctrl-undo"
-              onClick={handleUndo}
-              style={{
-                visibility: isActive && total > 0 ? 'visible' : 'hidden',
-              }}
-            >
-              <span>↩</span>
-              <span>Undo</span>
-            </button>
-            <button
-              className="ctrl-btn ctrl-end"
+              className="ctrl-btn ctrl-end ctrl-side"
               onClick={handleEnd}
               style={{ visibility: isActive ? 'visible' : 'hidden' }}
+              title="End session"
             >
               <CheckeredFlagIcon style={{ width: '1em', height: '1em' }} />
-              <span>End</span>
             </button>
           </div>
         </div>

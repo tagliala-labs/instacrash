@@ -129,6 +129,20 @@ body {
   border: 1px solid rgba(219, 39, 119, 0.3);
 }
 
+.col-male {
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(37, 99, 235, 0.35);
+  border-radius: 18px;
+  padding: 10px;
+}
+
+.col-female {
+  background: rgba(219, 39, 119, 0.1);
+  border: 1px solid rgba(219, 39, 119, 0.35);
+  border-radius: 18px;
+  padding: 10px;
+}
+
 /* ── Count buttons ───────────────────────────────────────────────────── */
 .count-btn {
   position: relative;
@@ -163,55 +177,55 @@ body {
 }
 
 .btn-male {
-  background: linear-gradient(145deg, #14532d 0%, #16a34a 55%, #2563eb 100%);
+  background: linear-gradient(160deg, #059669 0%, #047857 100%);
   box-shadow:
-    0 8px 32px rgba(22, 163, 74, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 4px 16px rgba(5, 150, 105, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .btn-male:not(:disabled):hover {
   box-shadow:
-    0 12px 40px rgba(22, 163, 74, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 8px 24px rgba(5, 150, 105, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .btn-female {
-  background: linear-gradient(145deg, #14532d 0%, #16a34a 55%, #db2777 100%);
+  background: linear-gradient(160deg, #059669 0%, #047857 100%);
   box-shadow:
-    0 8px 32px rgba(22, 163, 74, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 4px 16px rgba(5, 150, 105, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .btn-female:not(:disabled):hover {
   box-shadow:
-    0 12px 40px rgba(22, 163, 74, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 8px 24px rgba(5, 150, 105, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .btn-male-infraction {
-  background: linear-gradient(145deg, #7f1d1d 0%, #dc2626 55%, #2563eb 100%);
+  background: linear-gradient(160deg, #b91c1c 0%, #991b1b 100%);
   box-shadow:
-    0 8px 32px rgba(220, 38, 38, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 4px 16px rgba(185, 28, 28, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .btn-male-infraction:not(:disabled):hover {
   box-shadow:
-    0 12px 40px rgba(220, 38, 38, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 8px 24px rgba(185, 28, 28, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .btn-female-infraction {
-  background: linear-gradient(145deg, #7f1d1d 0%, #dc2626 55%, #db2777 100%);
+  background: linear-gradient(160deg, #b91c1c 0%, #991b1b 100%);
   box-shadow:
-    0 8px 32px rgba(220, 38, 38, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 4px 16px rgba(185, 28, 28, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .btn-female-infraction:not(:disabled):hover {
   box-shadow:
-    0 12px 40px rgba(220, 38, 38, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 8px 24px rgba(185, 28, 28, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .count-label {
@@ -283,13 +297,13 @@ body {
 }
 
 .ctrl-start {
-  background: radial-gradient(circle at center, #10b981 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #059669, #10b981);
   color: white;
   box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
 }
 
 .ctrl-start:hover {
-  box-shadow: 0 6px 24px rgba(37, 99, 235, 0.5);
+  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.5);
 }
 
 .ctrl-pause {
@@ -303,23 +317,23 @@ body {
 }
 
 .ctrl-resume {
-  background: radial-gradient(circle at center, #10b981 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #059669, #10b981);
   color: white;
   box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
 }
 
 .ctrl-resume:hover {
-  box-shadow: 0 6px 24px rgba(37, 99, 235, 0.5);
+  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.5);
 }
 
 .ctrl-end {
-  background: radial-gradient(circle at center, #ef4444 0%, #db2777 100%);
+  background: linear-gradient(135deg, #dc2626, #ef4444);
   color: white;
   box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
 }
 
 .ctrl-end:hover {
-  box-shadow: 0 6px 24px rgba(219, 39, 119, 0.5);
+  box-shadow: 0 6px 24px rgba(239, 68, 68, 0.5);
 }
 
 .ctrl-undo {

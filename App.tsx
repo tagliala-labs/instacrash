@@ -472,7 +472,7 @@ export default function App() {
         {/* Count Buttons — two gender columns */}
         <div className="mb-4 grid grid-cols-2 gap-3">
           {/* ── Male column ── */}
-          <div className="flex flex-col gap-2">
+          <div className="col-male flex flex-col gap-2">
             <div className="col-gender-header col-male-header">
               <PersonIcon style={{ width: '1.4rem', height: '1.4rem' }} />
               <span>Male driver</span>
@@ -514,7 +514,7 @@ export default function App() {
           </div>
 
           {/* ── Female column ── */}
-          <div className="flex flex-col gap-2">
+          <div className="col-female flex flex-col gap-2">
             <div className="col-gender-header col-female-header">
               <PersonDressIcon style={{ width: '1.4rem', height: '1.4rem' }} />
               <span>Female driver</span>

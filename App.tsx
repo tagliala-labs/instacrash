@@ -4,6 +4,7 @@ import {
   CarIcon,
   ChartPieIcon,
   CheckeredFlagIcon,
+  CheckIcon,
   ChevronRightIcon,
   ClockRotateLeftIcon,
   MobileScreenButtonIcon,
@@ -466,69 +467,71 @@ export default function App() {
           </div>
         </div>
 
-        {/* Count Buttons */}
+        {/* Count Buttons — two gender columns */}
         <div className="mb-4 grid grid-cols-2 gap-3">
-          <button
-            ref={(el) => {
-              btnRefs.current.male = el;
-            }}
-            className="count-btn btn-male"
-            onClick={() => register('male')}
-            disabled={!isRunning}
-          >
-            <PersonIcon style={{ width: '2rem', height: '2rem' }} />
-            <span className="count-label">😊 Male Driver</span>
-            <span className="count-number">{male}</span>
-          </button>
-
-          <button
-            ref={(el) => {
-              btnRefs.current.female = el;
-            }}
-            className="count-btn btn-female"
-            onClick={() => register('female')}
-            disabled={!isRunning}
-          >
-            <PersonDressIcon style={{ width: '2rem', height: '2rem' }} />
-            <span className="count-label">😊 Female Driver</span>
-            <span className="count-number">{female}</span>
-          </button>
-
-          <button
-            ref={(el) => {
-              btnRefs.current.malePhone = el;
-            }}
-            className="count-btn btn-male-infraction"
-            onClick={() => register('malePhone')}
-            disabled={!isRunning}
-          >
-            <div className="flex items-center gap-2">
-              <PersonIcon style={{ width: '2rem', height: '2rem' }} />
-              <MobileScreenButtonIcon
-                style={{ width: '1.3rem', height: '1.3rem', color: '#fca5a5' }}
-              />
+          {/* ── Male column ── */}
+          <div className="flex flex-col gap-2">
+            <div className="col-gender-header col-male-header">
+              <PersonIcon style={{ width: '1rem', height: '1rem' }} />
+              <span>Male</span>
             </div>
-            <span className="count-label">😡 Male + Phone</span>
-            <span className="count-number">{malePhone}</span>
-          </button>
-
-          <button
-            ref={(el) => {
-              btnRefs.current.femalePhone = el;
-            }}
-            className="count-btn btn-female-infraction"
-            onClick={() => register('femalePhone')}
-            disabled={!isRunning}
-          >
-            <div className="flex items-center gap-2">
-              <PersonDressIcon style={{ width: '2rem', height: '2rem' }} />
+            <button
+              ref={(el) => {
+                btnRefs.current.male = el;
+              }}
+              className="count-btn btn-male"
+              onClick={() => register('male')}
+              disabled={!isRunning}
+            >
+              <CheckIcon style={{ width: '1.6rem', height: '1.6rem' }} />
+              <span className="count-number">{male}</span>
+            </button>
+            <button
+              ref={(el) => {
+                btnRefs.current.malePhone = el;
+              }}
+              className="count-btn btn-male-infraction"
+              onClick={() => register('malePhone')}
+              disabled={!isRunning}
+            >
               <MobileScreenButtonIcon
-                style={{ width: '1.3rem', height: '1.3rem', color: '#fca5a5' }}
+                style={{ width: '1.6rem', height: '1.6rem' }}
               />
+              <span className="count-number">{malePhone}</span>
+            </button>
+          </div>
+
+          {/* ── Female column ── */}
+          <div className="flex flex-col gap-2">
+            <div className="col-gender-header col-female-header">
+              <PersonDressIcon style={{ width: '1rem', height: '1rem' }} />
+              <span>Female</span>
             </div>
-            <span className="count-label">😡 Female + Phone</span>
-            <span className="count-number">{femalePhone}</span>
-          </button>
+            <button
+              ref={(el) => {
+                btnRefs.current.female = el;
+              }}
+              className="count-btn btn-female"
+              onClick={() => register('female')}
+              disabled={!isRunning}
+            >
+              <CheckIcon style={{ width: '1.6rem', height: '1.6rem' }} />
+              <span className="count-number">{female}</span>
+            </button>
+            <button
+              ref={(el) => {
+                btnRefs.current.femalePhone = el;
+              }}
+              className="count-btn btn-female-infraction"
+              onClick={() => register('femalePhone')}
+              disabled={!isRunning}
+            >
+              <MobileScreenButtonIcon
+                style={{ width: '1.6rem', height: '1.6rem' }}
+              />
+              <span className="count-number">{femalePhone}</span>
+            </button>
+          </div>
         </div>
 
         {/* Live Stats & Chart */}

@@ -16,7 +16,8 @@
   box-sizing: border-box;
 }
 
-button, [role="button"] {
+button,
+[role='button'] {
   cursor: pointer;
 }
 
@@ -534,10 +535,22 @@ body {
 
 /* ── Floating combo text ─────────────────────────────────────────────── */
 @keyframes combo-fly {
-  0%   { opacity: 0; transform: scale(0.5) translateY(0); }
-  20%  { opacity: 1; transform: scale(1.3) translateY(-15px); }
-  65%  { opacity: 1; transform: scale(1.0) translateY(-55px); }
-  100% { opacity: 0; transform: scale(0.85) translateY(-110px); }
+  0% {
+    opacity: 0;
+    transform: scale(0.5) translateY(0);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1.3) translateY(-15px);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1) translateY(-55px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.85) translateY(-110px);
+  }
 }
 
 .floating-combo {
@@ -594,26 +607,74 @@ body {
 
 /* Male: flipped (faces right), left → right */
 @keyframes police-car-ltr {
-  0%   { transform: translateX(-120px) scaleX(-1); opacity: 0; }
-  5%   { transform: translateX(-120px) scaleX(-1) rotateZ(0deg);   opacity: 1; }
-  22%  { transform: translateX(28vw)   scaleX(-1) rotateZ(0deg);   opacity: 1; } /* fast entry */
-  36%  { transform: translateX(36vw)   scaleX(-1) rotateZ(-12deg); opacity: 1; } /* braking hard */
-  54%  { transform: translateX(39vw)   scaleX(-1) rotateZ(-14deg); opacity: 1; } /* almost stopped, before center */
-  70%  { transform: translateX(65vw)   scaleX(-1) rotateZ(10deg);  opacity: 1; } /* accelerating through center */
-  84%  { transform: translateX(calc(100vw + 120px)) scaleX(-1) rotateZ(0deg); opacity: 1; } /* abrupt exit */
-  100% { transform: translateX(calc(100vw + 120px)) scaleX(-1); opacity: 0; }
+  0% {
+    transform: translateX(-120px) scaleX(-1);
+    opacity: 0;
+  }
+  5% {
+    transform: translateX(-120px) scaleX(-1) rotateZ(0deg);
+    opacity: 1;
+  }
+  22% {
+    transform: translateX(28vw) scaleX(-1) rotateZ(0deg);
+    opacity: 1;
+  } /* fast entry */
+  36% {
+    transform: translateX(36vw) scaleX(-1) rotateZ(-12deg);
+    opacity: 1;
+  } /* braking hard */
+  54% {
+    transform: translateX(39vw) scaleX(-1) rotateZ(-14deg);
+    opacity: 1;
+  } /* almost stopped, before center */
+  70% {
+    transform: translateX(65vw) scaleX(-1) rotateZ(10deg);
+    opacity: 1;
+  } /* accelerating through center */
+  84% {
+    transform: translateX(calc(100vw + 120px)) scaleX(-1) rotateZ(0deg);
+    opacity: 1;
+  } /* abrupt exit */
+  100% {
+    transform: translateX(calc(100vw + 120px)) scaleX(-1);
+    opacity: 0;
+  }
 }
 
 /* Female: normal (faces left), right → left */
 @keyframes police-car-rtl {
-  0%   { transform: translateX(calc(100vw + 120px)); opacity: 0; }
-  5%   { transform: translateX(calc(100vw + 120px)) rotateZ(0deg);   opacity: 1; }
-  22%  { transform: translateX(72vw)  rotateZ(0deg);   opacity: 1; } /* fast entry */
-  36%  { transform: translateX(64vw)  rotateZ(-12deg); opacity: 1; } /* braking hard */
-  54%  { transform: translateX(61vw)  rotateZ(-14deg); opacity: 1; } /* almost stopped, before center */
-  70%  { transform: translateX(35vw)  rotateZ(10deg);  opacity: 1; } /* accelerating through center */
-  84%  { transform: translateX(-120px) rotateZ(0deg);  opacity: 1; } /* abrupt exit */
-  100% { transform: translateX(-120px); opacity: 0; }
+  0% {
+    transform: translateX(calc(100vw + 120px));
+    opacity: 0;
+  }
+  5% {
+    transform: translateX(calc(100vw + 120px)) rotateZ(0deg);
+    opacity: 1;
+  }
+  22% {
+    transform: translateX(72vw) rotateZ(0deg);
+    opacity: 1;
+  } /* fast entry */
+  36% {
+    transform: translateX(64vw) rotateZ(-12deg);
+    opacity: 1;
+  } /* braking hard */
+  54% {
+    transform: translateX(61vw) rotateZ(-14deg);
+    opacity: 1;
+  } /* almost stopped, before center */
+  70% {
+    transform: translateX(35vw) rotateZ(10deg);
+    opacity: 1;
+  } /* accelerating through center */
+  84% {
+    transform: translateX(-120px) rotateZ(0deg);
+    opacity: 1;
+  } /* abrupt exit */
+  100% {
+    transform: translateX(-120px);
+    opacity: 0;
+  }
 }
 
 .police-car {

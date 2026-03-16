@@ -14,6 +14,7 @@ import {
   PersonDressIcon,
   PersonIcon,
   PlayIcon,
+  QuestionCircleIcon,
   RotateLeftIcon,
   TrashIcon,
   VolumeHighIcon,
@@ -61,7 +62,9 @@ function detectLang(): Lang {
     const s = localStorage.getItem(LANG_KEY);
     if (s === 'en' || s === 'it') return s;
   } catch {}
-  return (navigator.language ?? '').toLowerCase().startsWith('it') ? 'it' : 'en';
+  return (navigator.language ?? '').toLowerCase().startsWith('it')
+    ? 'it'
+    : 'en';
 }
 
 function detectSound(): boolean {
@@ -90,7 +93,10 @@ function playSafeSound() {
     const gain = ctx.createGain();
     osc.type = 'sine';
     osc.frequency.setValueAtTime(freq, t + i * 0.04);
-    osc.frequency.exponentialRampToValueAtTime(freq * 0.85, t + i * 0.04 + 0.12);
+    osc.frequency.exponentialRampToValueAtTime(
+      freq * 0.85,
+      t + i * 0.04 + 0.12
+    );
     gain.gain.setValueAtTime(0, t + i * 0.04);
     gain.gain.linearRampToValueAtTime(0.22, t + i * 0.04 + 0.008);
     gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.04 + 0.18);
@@ -113,7 +119,10 @@ function playInfractionSound() {
     osc.frequency.setValueAtTime(freq, t + i * 0.1);
     osc.frequency.exponentialRampToValueAtTime(freq * 0.7, t + i * 0.1 + 0.12);
     gain.gain.setValueAtTime(0, t + i * 0.1);
-    gain.gain.linearRampToValueAtTime(i === 0 ? 0.22 : 0.16, t + i * 0.1 + 0.01);
+    gain.gain.linearRampToValueAtTime(
+      i === 0 ? 0.22 : 0.16,
+      t + i * 0.1 + 0.01
+    );
     gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.1 + 0.28);
     // Low-pass to add weight
     const lpf = ctx.createBiquadFilter();
@@ -172,14 +181,14 @@ function playSirenSound(direction: 'ltr' | 'rtl') {
   //   CSS: 0.25s delay, 2.8s duration, linear. Siren lead = 0.08s → anim offset = 0.17s.
   //   Velocities: entry 58.8 vw/s → braking ~18 vw/s → stop ~4 vw/s → accel 58 vw/s → exit 140 vw/s
   const K = {
-    enter:   0.31,  // 5% car appears, fast approach 58.8 vw/s
-    fastEnd: 0.79,  // 22% fast entry ends, car at 28vw
-    brake:   1.18,  // 36% braking, 36vw
-    stop:    1.68,  // 54% almost stopped, 39vw — clearly before center
-    pass:    1.87,  // center crossing ~50vw at 58 vw/s (accelerating)
-    accel:   2.13,  // 70% acceleration peak, 65vw
-    exit:    2.52,  // 84% abrupt exit
-    end:     2.72,
+    enter: 0.31, // 5% car appears, fast approach 58.8 vw/s
+    fastEnd: 0.79, // 22% fast entry ends, car at 28vw
+    brake: 1.18, // 36% braking, 36vw
+    stop: 1.68, // 54% almost stopped, 39vw — clearly before center
+    pass: 1.87, // center crossing ~50vw at 58 vw/s (accelerating)
+    accel: 2.13, // 70% acceleration peak, 65vw
+    exit: 2.52, // 84% abrupt exit
+    end: 2.72,
   };
 
   // Signal chain: osc → lpf → masterGain → panner → destination
@@ -219,53 +228,55 @@ function playSirenSound(direction: 'ltr' | 'rtl') {
   osc.frequency.linearRampToValueAtTime(704, t0 + K.stop + 0.12); // zero-velocity moment
   osc.frequency.linearRampToValueAtTime(578, t0 + K.pass + 0.12); // Doppler drop
   osc.frequency.linearRampToValueAtTime(510, t0 + K.accel);
-  osc.frequency.linearRampToValueAtTime(434, t0 + K.exit);        // 140 vw/s recession
+  osc.frequency.linearRampToValueAtTime(434, t0 + K.exit); // 140 vw/s recession
   osc.frequency.linearRampToValueAtTime(390, t0 + K.end);
 
   // ─ LFO RATE: sweep cycle is Doppler-compressed approaching, stretched receding ─
-  lfo.frequency.setValueAtTime(2.10, t0);
-  lfo.frequency.linearRampToValueAtTime(2.25, t0 + K.enter);   // fast approach
+  lfo.frequency.setValueAtTime(2.1, t0);
+  lfo.frequency.linearRampToValueAtTime(2.25, t0 + K.enter); // fast approach
   lfo.frequency.linearRampToValueAtTime(1.92, t0 + K.brake);
-  lfo.frequency.linearRampToValueAtTime(1.78, t0 + K.stop);    // near-static
-  lfo.frequency.linearRampToValueAtTime(1.50, t0 + K.accel);   // receding
+  lfo.frequency.linearRampToValueAtTime(1.78, t0 + K.stop); // near-static
+  lfo.frequency.linearRampToValueAtTime(1.5, t0 + K.accel); // receding
   lfo.frequency.linearRampToValueAtTime(1.22, t0 + K.end);
 
   // ─ LFO SWING: proportional to velocity (faster = wider wee–woo arc) ───
   lfoGain.gain.setValueAtTime(115, t0);
-  lfoGain.gain.linearRampToValueAtTime(155, t0 + K.enter);     // fast = wide
+  lfoGain.gain.linearRampToValueAtTime(155, t0 + K.enter); // fast = wide
   lfoGain.gain.linearRampToValueAtTime(100, t0 + K.brake);
-  lfoGain.gain.linearRampToValueAtTime(55,  t0 + K.stop);      // near-zero = narrow
-  lfoGain.gain.linearRampToValueAtTime(55,  t0 + K.pass);
-  lfoGain.gain.linearRampToValueAtTime(115, t0 + K.accel);     // accelerating again
-  lfoGain.gain.linearRampToValueAtTime(145, t0 + K.exit);      // fast exit
-  lfoGain.gain.linearRampToValueAtTime(70,  t0 + K.end);
+  lfoGain.gain.linearRampToValueAtTime(55, t0 + K.stop); // near-zero = narrow
+  lfoGain.gain.linearRampToValueAtTime(55, t0 + K.pass);
+  lfoGain.gain.linearRampToValueAtTime(115, t0 + K.accel); // accelerating again
+  lfoGain.gain.linearRampToValueAtTime(145, t0 + K.exit); // fast exit
+  lfoGain.gain.linearRampToValueAtTime(70, t0 + K.end);
 
   // ─ STEREO PAN: mapped from exact car position ──────────────────────
   // pan(vw) = (vw − 50) / 62  — negative = left, positive = right
   // LTR: -0.9 → 0 → +0.9  |  RTL: mirrored
   const sgn = direction === 'ltr' ? 1 : -1;
-  panner.pan.setValueAtTime(-0.90 * sgn, t0);
+  panner.pan.setValueAtTime(-0.9 * sgn, t0);
   panner.pan.linearRampToValueAtTime(-0.85 * sgn, t0 + K.enter);
   panner.pan.linearRampToValueAtTime(-0.37 * sgn, t0 + K.fastEnd); // 28vw
-  panner.pan.linearRampToValueAtTime(-0.23 * sgn, t0 + K.brake);   // 36vw
-  panner.pan.linearRampToValueAtTime(-0.18 * sgn, t0 + K.stop);    // 39vw
-  panner.pan.linearRampToValueAtTime( 0,           t0 + K.pass);    // 50vw center
-  panner.pan.linearRampToValueAtTime( 0.25 * sgn, t0 + K.accel);   // 65vw
-  panner.pan.linearRampToValueAtTime( 0.90 * sgn, t0 + K.exit);
+  panner.pan.linearRampToValueAtTime(-0.23 * sgn, t0 + K.brake); // 36vw
+  panner.pan.linearRampToValueAtTime(-0.18 * sgn, t0 + K.stop); // 39vw
+  panner.pan.linearRampToValueAtTime(0, t0 + K.pass); // 50vw center
+  panner.pan.linearRampToValueAtTime(0.25 * sgn, t0 + K.accel); // 65vw
+  panner.pan.linearRampToValueAtTime(0.9 * sgn, t0 + K.exit);
 
   // ─ VOLUME: inverse distance from center + envelope ─────────────────
   // Loudest when car is nearest (at K.pass, 50vw), quieter at edges
-  masterGain.gain.setValueAtTime(0,    t0);
+  masterGain.gain.setValueAtTime(0, t0);
   masterGain.gain.linearRampToValueAtTime(0.07, t0 + K.enter);
   masterGain.gain.linearRampToValueAtTime(0.15, t0 + K.brake);
   masterGain.gain.linearRampToValueAtTime(0.24, t0 + K.stop);
-  masterGain.gain.linearRampToValueAtTime(0.28, t0 + K.pass);    // closest
+  masterGain.gain.linearRampToValueAtTime(0.28, t0 + K.pass); // closest
   masterGain.gain.linearRampToValueAtTime(0.18, t0 + K.accel);
   masterGain.gain.linearRampToValueAtTime(0.08, t0 + K.exit);
-  masterGain.gain.linearRampToValueAtTime(0,    t0 + K.end);
+  masterGain.gain.linearRampToValueAtTime(0, t0 + K.end);
 
-  lfo.start(t0); lfo.stop(t0 + K.end + 0.05);
-  osc.start(t0); osc.stop(t0 + K.end + 0.05);
+  lfo.start(t0);
+  lfo.stop(t0 + K.end + 0.05);
+  osc.start(t0);
+  osc.stop(t0 + K.end + 0.05);
 }
 
 const T: Record<
@@ -308,6 +319,8 @@ const T: Record<
     maxCombo: string;
     cancel: string;
     delete: string;
+    helpTitle: string;
+    close: string;
   }
 > = {
   en: {
@@ -348,6 +361,8 @@ const T: Record<
     maxCombo: 'Max combo',
     cancel: 'Cancel',
     delete: 'Delete',
+    helpTitle: 'How to use',
+    close: 'Close',
   },
   it: {
     tagline: 'Segui chi usa il telefono alla guida',
@@ -387,6 +402,8 @@ const T: Record<
     maxCombo: 'Max combo',
     cancel: 'Annulla',
     delete: 'Elimina',
+    helpTitle: 'Come funziona',
+    close: 'Chiudi',
   },
 };
 
@@ -425,7 +442,9 @@ export default function App() {
   const [displayTime, setDisplayTime] = useState('00:00:00');
   const [measurements, setMeasurements] =
     useState<Measurement[]>(loadMeasurements);
-  const [sirenActive, setSirenActive] = useState<'male' | 'female' | null>(null);
+  const [sirenActive, setSirenActive] = useState<'male' | 'female' | null>(
+    null
+  );
   const [selectedMeasurement, setSelectedMeasurement] =
     useState<Measurement | null>(null);
   const [lang, setLang] = useState<Lang>(detectLang);
@@ -433,6 +452,7 @@ export default function App() {
   const [soundEnabled, setSoundEnabled] = useState<boolean>(detectSound);
   const [comboCount, setComboCount] = useState(0);
   const [longestCombo, setLongestCombo] = useState(0);
+  const [showHelp, setShowHelp] = useState(false);
 
   // Refs for values used inside callbacks without causing re-renders
   const elapsedRef = useRef(0);
@@ -729,7 +749,9 @@ export default function App() {
   function toggleSound() {
     setSoundEnabled((prev) => {
       const next = !prev;
-      try { localStorage.setItem(SOUND_KEY, String(next)); } catch {}
+      try {
+        localStorage.setItem(SOUND_KEY, String(next));
+      } catch {}
       return next;
     });
   }
@@ -783,638 +805,852 @@ export default function App() {
         : 'status-paused';
 
   const statusLabel =
-    appState === 'idle' ? t.idle : appState === 'running' ? t.running : t.paused;
+    appState === 'idle'
+      ? t.idle
+      : appState === 'running'
+        ? t.running
+        : t.paused;
 
   return (
     <>
-    <div
-      className="min-h-screen p-4 pb-8"
-      style={{ background: 'var(--bg)', color: 'var(--text)' }}
-    >
-      {/* Police siren overlay */}
-      {sirenActive && (
-        <>
-          <div className="siren-overlay" aria-hidden="true" />
-          <div className={`police-car police-car--${sirenActive}`} aria-hidden="true">🚓</div>
-        </>
-      )}
+      <div
+        className="min-h-screen p-4 pb-8"
+        style={{ background: 'var(--bg)', color: 'var(--text)' }}
+      >
+        {/* Police siren overlay */}
+        {sirenActive && (
+          <>
+            <div className="siren-overlay" aria-hidden="true" />
+            <div
+              className={`police-car police-car--${sirenActive}`}
+              aria-hidden="true"
+            >
+              🚓
+            </div>
+          </>
+        )}
 
-      <div className="mx-auto max-w-lg">
-        {/* Header */}
-        <div className="relative pt-2 pb-3 text-center">
-          <div className="absolute right-0 top-2 flex items-center gap-1">
-            <button
-              onClick={toggleSound}
-              className="rounded px-2 py-1 text-gray-500 transition-colors hover:text-white"
-              title={soundEnabled ? 'Mute sounds' : 'Enable sounds'}
-            >
-              {soundEnabled
-                ? <VolumeHighIcon style={{ width: '1rem', height: '1rem' }} />
-                : <VolumeXmarkIcon style={{ width: '1rem', height: '1rem' }} />}
-            </button>
-            <button
-              onClick={toggleLang}
-              className="rounded px-2 py-1 text-sm font-bold tracking-widest text-gray-500 uppercase transition-colors hover:text-white"
-            >
-              {lang === 'en' ? 'IT' : 'EN'}
-            </button>
+        <div className="mx-auto max-w-lg">
+          {/* Header */}
+          <div className="relative pt-2 pb-3 text-center">
+            <div className="absolute top-2 left-0">
+              <button
+                onClick={() => setShowHelp(true)}
+                className="rounded px-2 py-1 text-gray-500 transition-colors hover:text-white"
+                title={t.helpTitle}
+              >
+                <QuestionCircleIcon style={{ width: '1rem', height: '1rem' }} />
+              </button>
+            </div>
+            <div className="absolute top-2 right-0 flex items-center gap-1">
+              <button
+                onClick={toggleSound}
+                className="rounded px-2 py-1 text-gray-500 transition-colors hover:text-white"
+                title={soundEnabled ? 'Mute sounds' : 'Enable sounds'}
+              >
+                {soundEnabled ? (
+                  <VolumeHighIcon style={{ width: '1rem', height: '1rem' }} />
+                ) : (
+                  <VolumeXmarkIcon style={{ width: '1rem', height: '1rem' }} />
+                )}
+              </button>
+              <button
+                onClick={toggleLang}
+                className="rounded px-2 py-1 text-sm font-bold tracking-widest text-gray-500 uppercase transition-colors hover:text-white"
+              >
+                {lang === 'en' ? 'IT' : 'EN'}
+              </button>
+            </div>
+            <div className="mb-1 flex items-center justify-center gap-3">
+              <MobileScreenButtonIcon
+                className="text-red-400"
+                style={{ width: '1.25rem', height: '1.25rem' }}
+              />
+              <h1
+                className="text-2xl font-bold text-white"
+                style={{ letterSpacing: '0.18em' }}
+              >
+                INSTACRASH
+              </h1>
+              <CarIcon
+                className="text-blue-400"
+                style={{ width: '1.25rem', height: '1.25rem' }}
+              />
+            </div>
+            <p className="text-sm tracking-wider text-gray-500 uppercase">
+              {t.tagline}
+            </p>
           </div>
-          <div className="mb-1 flex items-center justify-center gap-3">
-            <MobileScreenButtonIcon
-              className="text-red-400"
-              style={{ width: '1.25rem', height: '1.25rem' }}
-            />
-            <h1
-              className="text-2xl font-bold text-white"
-              style={{ letterSpacing: '0.18em' }}
-            >
-              INSTACRASH
-            </h1>
-            <CarIcon
-              className="text-blue-400"
-              style={{ width: '1.25rem', height: '1.25rem' }}
-            />
-          </div>
-          <p className="text-sm tracking-wider text-gray-500 uppercase">
-            {t.tagline}
-          </p>
-        </div>
 
-        {/* Control Panel */}
-        <div className="stat-card mb-3">
-          <div className="mb-3 flex items-center gap-3">
-            <div className="timer-display">{displayTime}</div>
-            <span className={`status-pill ${statusPillClass}`}>
-              <span className="status-dot" />
-              <span>{statusLabel}</span>
+          {/* Control Panel */}
+          <div className="stat-card mb-3">
+            <div className="mb-3 flex items-center gap-3">
+              <div className="timer-display">{displayTime}</div>
+              <span className={`status-pill ${statusPillClass}`}>
+                <span className="status-dot" />
+                <span>{statusLabel}</span>
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                className="ctrl-btn ctrl-undo ctrl-side"
+                onClick={handleUndo}
+                disabled={!isActive || total === 0}
+                title={t.undoTitle}
+              >
+                <RotateLeftIcon style={{ width: '1em', height: '1em' }} />
+              </button>
+              <button
+                className={`ctrl-btn flex-1 ${startPauseBtnClass}`}
+                onClick={handleStartPause}
+              >
+                {appState === 'running' ? (
+                  <PauseIcon style={{ width: '1em', height: '1em' }} />
+                ) : (
+                  <PlayIcon style={{ width: '1em', height: '1em' }} />
+                )}
+                <span className="mr-auto">{startPauseLabel}</span>
+              </button>
+              <button
+                className="ctrl-btn ctrl-end"
+                onClick={handleEnd}
+                disabled={appState !== 'paused'}
+              >
+                <CheckeredFlagIcon style={{ width: '1em', height: '1em' }} />
+                <span>{t.endTitle}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Total observed */}
+          <div className="stat-card mb-3 flex items-center justify-between">
+            <span className="text-base font-bold tracking-widest text-gray-400 uppercase">
+              {t.totalObserved}
             </span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              className="ctrl-btn ctrl-undo ctrl-side"
-              onClick={handleUndo}
-              disabled={!isActive || total === 0}
-              title={t.undoTitle}
-            >
-              <RotateLeftIcon style={{ width: '1em', height: '1em' }} />
-            </button>
-            <button
-              className={`ctrl-btn flex-1 ${startPauseBtnClass}`}
-              onClick={handleStartPause}
-            >
-              {appState === 'running' ? (
-                <PauseIcon style={{ width: '1em', height: '1em' }} />
-              ) : (
-                <PlayIcon style={{ width: '1em', height: '1em' }} />
+            <div className="flex items-center gap-3">
+              {comboCount >= 2 && (
+                <span className="combo-pill combo-active">
+                  🔥 {comboCount}×
+                </span>
               )}
-              <span className="mr-auto">{startPauseLabel}</span>
-            </button>
-            <button
-              className="ctrl-btn ctrl-end"
-              onClick={handleEnd}
-              disabled={appState !== 'paused'}
-            >
-              <CheckeredFlagIcon style={{ width: '1em', height: '1em' }} />
-              <span>{t.endTitle}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Total observed */}
-        <div className="stat-card mb-3 flex items-center justify-between">
-          <span className="text-base font-bold tracking-widest text-gray-400 uppercase">
-            {t.totalObserved}
-          </span>
-          <div className="flex items-center gap-3">
-            {comboCount >= 2 && (
-              <span className="combo-pill combo-active">🔥 {comboCount}×</span>
-            )}
-            <span className="mono text-2xl font-medium text-white">{total}</span>
-          </div>
-        </div>
-
-        {/* Count Buttons — two gender columns */}
-        <div className="mb-4 grid grid-cols-2 gap-3">
-          {/* ── Male column ── */}
-          <div className="col-male flex flex-col gap-2">
-            <button
-              ref={(el) => {
-                btnRefs.current.male = el;
-              }}
-              className="count-btn btn-male"
-              onClick={() => register('male')}
-              disabled={!isRunning}
-            >
-              <div
-                style={{ display: 'flex', gap: '2px', alignItems: 'center' }}
-              >
-                <CheckIcon style={{ width: '2rem', height: '2rem' }} />
-                <FaceSmileBeamIcon style={{ width: '2rem', height: '2rem' }} />
-              </div>
-              <span className="count-number">{male}</span>
-            </button>
-            <div className="col-gender-header col-male-header">
-              <PersonIcon style={{ width: '1.4rem', height: '1.4rem' }} />
-              <span>{t.maleDriver}</span>
-            </div>
-            <button
-              ref={(el) => {
-                btnRefs.current.malePhone = el;
-              }}
-              className="count-btn btn-male-infraction"
-              onClick={() => register('malePhone')}
-              disabled={!isRunning}
-            >
-              <div
-                style={{ display: 'flex', gap: '2px', alignItems: 'center' }}
-              >
-                <MobileScreenButtonIcon
-                  style={{ width: '2rem', height: '2rem' }}
-                />
-                <FaceAngryIcon style={{ width: '2rem', height: '2rem' }} />
-              </div>
-              <span className="count-number">{malePhone}</span>
-            </button>
-          </div>
-
-          {/* ── Female column ── */}
-          <div className="col-female flex flex-col gap-2">
-            <button
-              ref={(el) => {
-                btnRefs.current.female = el;
-              }}
-              className="count-btn btn-female"
-              onClick={() => register('female')}
-              disabled={!isRunning}
-            >
-              <div
-                style={{ display: 'flex', gap: '2px', alignItems: 'center' }}
-              >
-                <CheckIcon style={{ width: '2rem', height: '2rem' }} />
-                <FaceSmileBeamIcon style={{ width: '2rem', height: '2rem' }} />
-              </div>
-              <span className="count-number">{female}</span>
-            </button>
-            <div className="col-gender-header col-female-header">
-              <PersonDressIcon style={{ width: '1.4rem', height: '1.4rem' }} />
-              <span>{t.femaleDriver}</span>
-            </div>
-            <button
-              ref={(el) => {
-                btnRefs.current.femalePhone = el;
-              }}
-              className="count-btn btn-female-infraction"
-              onClick={() => register('femalePhone')}
-              disabled={!isRunning}
-            >
-              <div
-                style={{ display: 'flex', gap: '2px', alignItems: 'center' }}
-              >
-                <MobileScreenButtonIcon
-                  style={{ width: '2rem', height: '2rem' }}
-                />
-                <FaceAngryIcon style={{ width: '2rem', height: '2rem' }} />
-              </div>
-              <span className="count-number">{femalePhone}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Live Stats & Chart */}
-        <div className="stat-card mb-4">
-          <div className="mb-3 flex items-center gap-2 text-xs tracking-widest text-gray-500 uppercase">
-            <ChartPieIcon
-              style={{
-                width: '0.875rem',
-                height: '0.875rem',
-                color: '#4b5563',
-              }}
-            />
-            {t.liveBreakdown}
-          </div>
-          <div className="flex items-center gap-4">
-            <div style={{ width: 140, height: 140, flexShrink: 0 }}>
-              <canvas ref={liveCanvasRef} />
-            </div>
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <span
-                  className="legend-dot"
-                  style={{ background: '#2563eb' }}
-                />
-                <span className="text-gray-400">{t.maleInfraction}</span>
-                <span className="mono ml-auto font-medium text-blue-400">
-                  {total ? `${pct(malePhone, total)}%` : '—'}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <span
-                  className="legend-dot"
-                  style={{ background: '#db2777' }}
-                />
-                <span className="text-gray-400">{t.femaleInfraction}</span>
-                <span className="mono ml-auto font-medium text-pink-400">
-                  {total ? `${pct(femalePhone, total)}%` : '—'}
-                </span>
-              </div>
-              <hr className="divider my-2" />
-              <div className="flex items-center gap-2 text-sm">
-                <span
-                  className="legend-dot"
-                  style={{ background: '#6b7280' }}
-                />
-                <span className="text-gray-400">{t.noInfraction}</span>
-                <span className="mono ml-auto font-medium text-gray-400">
-                  {total ? `${pct(male + female, total)}%` : '—'}
-                </span>
-              </div>
-              <hr className="divider my-2" />
-              <div className="space-y-1 text-xs text-gray-500">
-                <div className="flex justify-between">
-                  <span>{t.totalMaleRate}</span>
-                  <span className="mono text-blue-400">
-                    {totalMale ? `${pct(malePhone, totalMale)}%` : '—'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>{t.totalFemaleRate}</span>
-                  <span className="mono text-pink-400">
-                    {totalFemale ? `${pct(femalePhone, totalFemale)}%` : '—'}
-                  </span>
-                </div>
-              </div>
+              <span className="mono text-2xl font-medium text-white">
+                {total}
+              </span>
             </div>
           </div>
-        </div>
 
-        {/* History */}
-        {measurements.length > 0 &&
-          (() => {
-            const gMale = measurements.reduce((s, m) => s + m.counts.male, 0);
-            const gFemale = measurements.reduce(
-              (s, m) => s + m.counts.female,
-              0
-            );
-            const gMalePhone = measurements.reduce(
-              (s, m) => s + m.counts.malePhone,
-              0
-            );
-            const gFemalePhone = measurements.reduce(
-              (s, m) => s + m.counts.femalePhone,
-              0
-            );
-            const gTotal = gMale + gFemale + gMalePhone + gFemalePhone;
-            const gTotalMale = gMale + gMalePhone;
-            const gTotalFemale = gFemale + gFemalePhone;
-            const gMaxCombo = measurements.reduce(
-              (max, m) => Math.max(max, m.longestCombo ?? 0),
-              0
-            );
-            const locale = lang === 'it' ? 'it-IT' : 'en-US';
-            return (
-              <div>
-                {/* Global aggregated stats */}
-                <div className="stat-card mb-4">
-                  <div className="mb-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-xs tracking-widest text-gray-500 uppercase">
-                      <ChartPieIcon
-                        style={{
-                          width: '0.875rem',
-                          height: '0.875rem',
-                          color: '#4b5563',
-                        }}
-                      />
-                      {t.allTimeTotals(measurements.length)}
-                    </div>
-                    {gMaxCombo >= 2 && (
-                      <span className="combo-pill combo-active" style={{ fontSize: '0.65rem', padding: '1px 7px' }}>🔥 {gMaxCombo}×</span>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="stat-card text-center">
-                      <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
-                        {t.maleRate}
-                      </div>
-                      <div className="mono text-2xl text-blue-400">
-                        {gTotalMale ? pct(gMalePhone, gTotalMale) : 0}%
-                      </div>
-                      <div className="mt-1 text-xs text-gray-600">
-                        {gMalePhone}/{gTotalMale}
-                      </div>
-                    </div>
-                    <div className="stat-card text-center">
-                      <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
-                        {t.femaleRate}
-                      </div>
-                      <div className="mono text-2xl text-pink-400">
-                        {gTotalFemale ? pct(gFemalePhone, gTotalFemale) : 0}%
-                      </div>
-                      <div className="mt-1 text-xs text-gray-600">
-                        {gFemalePhone}/{gTotalFemale}
-                      </div>
-                    </div>
-                    <div className="stat-card text-center">
-                      <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
-                        {t.overall}
-                      </div>
-                      <div className="mono text-2xl text-white">
-                        {gTotal ? pct(gMalePhone + gFemalePhone, gTotal) : 0}%
-                      </div>
-                      <div className="mt-1 text-xs text-gray-600">
-                        {gMalePhone + gFemalePhone}/{gTotal}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mb-3 flex items-center gap-2 text-xs tracking-widest text-gray-500 uppercase">
-                  <ClockRotateLeftIcon
-                    style={{
-                      width: '0.875rem',
-                      height: '0.875rem',
-                      color: '#4b5563',
-                    }}
+          {/* Count Buttons — two gender columns */}
+          <div className="mb-4 grid grid-cols-2 gap-3">
+            {/* ── Male column ── */}
+            <div className="col-male flex flex-col gap-2">
+              <button
+                ref={(el) => {
+                  btnRefs.current.male = el;
+                }}
+                className="count-btn btn-male"
+                onClick={() => register('male')}
+                disabled={!isRunning}
+              >
+                <div
+                  style={{ display: 'flex', gap: '2px', alignItems: 'center' }}
+                >
+                  <CheckIcon style={{ width: '2rem', height: '2rem' }} />
+                  <FaceSmileBeamIcon
+                    style={{ width: '2rem', height: '2rem' }}
                   />
-                  {t.pastMeasurements}
                 </div>
-                <div className="space-y-2">
-                  {measurements.map((m, i) => {
-                    const c = m.counts;
-                    const tot =
-                      c.male + c.female + c.malePhone + c.femalePhone;
-                    const infrPct = tot
-                      ? pct(c.malePhone + c.femalePhone, tot)
-                      : 0;
-                    const d = new Date(m.date);
-                    const dateStr = d.toLocaleDateString(locale, {
-                      month: 'short',
-                      day: 'numeric',
-                    });
-                    const timeStr = d.toLocaleTimeString(locale, {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    });
-                    const rateColor =
-                      infrPct > 50
-                        ? 'text-red-400'
-                        : infrPct > 20
-                          ? 'text-amber-400'
-                          : 'text-green-400';
-                    return (
-                      <div
-                        key={m.id}
-                        className="history-item"
-                        onClick={() => setSelectedMeasurement(m)}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ')
-                            setSelectedMeasurement(m);
-                        }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-semibold tracking-wide text-white">
-                              {t.measurement(measurements.length - i)}
-                            </div>
-                            <div className="mono mt-0.5 text-xs text-gray-500">
-                              {dateStr} · {timeStr} · {formatTime(m.duration)}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div
-                              className={`mono text-lg font-medium ${rateColor}`}
-                            >
-                              {infrPct}%
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              {t.infractionRate}
-                            </div>
-                          </div>
-                          <ChevronRightIcon
-                            className="ml-3 text-gray-600"
-                            style={{ width: '0.75rem', height: '0.75rem' }}
-                          />
-                        </div>
-                        <div className="mt-3 flex gap-3">
-                          <div className="flex items-center gap-1.5 text-xs">
-                            <span
-                              className="h-2 w-2 rounded-full"
-                              style={{ background: '#2563eb' }}
-                            />
-                            <span className="text-gray-400">
-                              {c.male}{' '}
-                              <span className="text-blue-400">
-                                +{c.malePhone}📱
-                              </span>
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-xs">
-                            <span
-                              className="h-2 w-2 rounded-full"
-                              style={{ background: '#db2777' }}
-                            />
-                            <span className="text-gray-400">
-                              {c.female}{' '}
-                              <span className="text-pink-400">
-                                +{c.femalePhone}📱
-                              </span>
-                            </span>
-                          </div>
-                          {(m.longestCombo ?? 0) >= 2 && (
-                            <span className="combo-pill combo-active" style={{ fontSize: '0.65rem', padding: '1px 7px' }}>🔥 {m.longestCombo}×</span>
-                          )}
-                          <div className="ml-auto text-xs text-gray-500">
-                            {tot} {t.observed}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                <span className="count-number">{male}</span>
+              </button>
+              <div className="col-gender-header col-male-header">
+                <PersonIcon style={{ width: '1.4rem', height: '1.4rem' }} />
+                <span>{t.maleDriver}</span>
+              </div>
+              <button
+                ref={(el) => {
+                  btnRefs.current.malePhone = el;
+                }}
+                className="count-btn btn-male-infraction"
+                onClick={() => register('malePhone')}
+                disabled={!isRunning}
+              >
+                <div
+                  style={{ display: 'flex', gap: '2px', alignItems: 'center' }}
+                >
+                  <MobileScreenButtonIcon
+                    style={{ width: '2rem', height: '2rem' }}
+                  />
+                  <FaceAngryIcon style={{ width: '2rem', height: '2rem' }} />
+                </div>
+                <span className="count-number">{malePhone}</span>
+              </button>
+            </div>
+
+            {/* ── Female column ── */}
+            <div className="col-female flex flex-col gap-2">
+              <button
+                ref={(el) => {
+                  btnRefs.current.female = el;
+                }}
+                className="count-btn btn-female"
+                onClick={() => register('female')}
+                disabled={!isRunning}
+              >
+                <div
+                  style={{ display: 'flex', gap: '2px', alignItems: 'center' }}
+                >
+                  <CheckIcon style={{ width: '2rem', height: '2rem' }} />
+                  <FaceSmileBeamIcon
+                    style={{ width: '2rem', height: '2rem' }}
+                  />
+                </div>
+                <span className="count-number">{female}</span>
+              </button>
+              <div className="col-gender-header col-female-header">
+                <PersonDressIcon
+                  style={{ width: '1.4rem', height: '1.4rem' }}
+                />
+                <span>{t.femaleDriver}</span>
+              </div>
+              <button
+                ref={(el) => {
+                  btnRefs.current.femalePhone = el;
+                }}
+                className="count-btn btn-female-infraction"
+                onClick={() => register('femalePhone')}
+                disabled={!isRunning}
+              >
+                <div
+                  style={{ display: 'flex', gap: '2px', alignItems: 'center' }}
+                >
+                  <MobileScreenButtonIcon
+                    style={{ width: '2rem', height: '2rem' }}
+                  />
+                  <FaceAngryIcon style={{ width: '2rem', height: '2rem' }} />
+                </div>
+                <span className="count-number">{femalePhone}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Live Stats & Chart */}
+          <div className="stat-card mb-4">
+            <div className="mb-3 flex items-center gap-2 text-xs tracking-widest text-gray-500 uppercase">
+              <ChartPieIcon
+                style={{
+                  width: '0.875rem',
+                  height: '0.875rem',
+                  color: '#4b5563',
+                }}
+              />
+              {t.liveBreakdown}
+            </div>
+            <div className="flex items-center gap-4">
+              <div style={{ width: 140, height: 140, flexShrink: 0 }}>
+                <canvas ref={liveCanvasRef} />
+              </div>
+              <div className="flex-1 space-y-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <span
+                    className="legend-dot"
+                    style={{ background: '#2563eb' }}
+                  />
+                  <span className="text-gray-400">{t.maleInfraction}</span>
+                  <span className="mono ml-auto font-medium text-blue-400">
+                    {total ? `${pct(malePhone, total)}%` : '—'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <span
+                    className="legend-dot"
+                    style={{ background: '#db2777' }}
+                  />
+                  <span className="text-gray-400">{t.femaleInfraction}</span>
+                  <span className="mono ml-auto font-medium text-pink-400">
+                    {total ? `${pct(femalePhone, total)}%` : '—'}
+                  </span>
+                </div>
+                <hr className="divider my-2" />
+                <div className="flex items-center gap-2 text-sm">
+                  <span
+                    className="legend-dot"
+                    style={{ background: '#6b7280' }}
+                  />
+                  <span className="text-gray-400">{t.noInfraction}</span>
+                  <span className="mono ml-auto font-medium text-gray-400">
+                    {total ? `${pct(male + female, total)}%` : '—'}
+                  </span>
+                </div>
+                <hr className="divider my-2" />
+                <div className="space-y-1 text-xs text-gray-500">
+                  <div className="flex justify-between">
+                    <span>{t.totalMaleRate}</span>
+                    <span className="mono text-blue-400">
+                      {totalMale ? `${pct(malePhone, totalMale)}%` : '—'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{t.totalFemaleRate}</span>
+                    <span className="mono text-pink-400">
+                      {totalFemale ? `${pct(femalePhone, totalFemale)}%` : '—'}
+                    </span>
+                  </div>
                 </div>
               </div>
-            );
-          })()}
-      </div>
-
-      {/* Detail modal */}
-      {selectedMeasurement && (
-        <div
-          className="modal-bg"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setSelectedMeasurement(null);
-          }}
-        >
-          <div className="modal-card">
-            <button
-              onClick={() => setSelectedMeasurement(null)}
-              className="modal-close-btn text-gray-500 transition-colors hover:text-white"
-            >
-              <XMarkIcon style={{ width: '1.25rem', height: '1.25rem' }} />
-            </button>
-            <div className="mb-4 pr-8">
-              <h2 className="text-xl font-bold tracking-wide text-white">
-                {t.measurementResults}
-              </h2>
-              <p className="mono mt-0.5 text-xs text-gray-500">
-                {new Date(selectedMeasurement.date).toLocaleDateString(
-                  lang === 'it' ? 'it-IT' : 'en-US',
-                  { weekday: 'long', month: 'long', day: 'numeric' }
-                )}{' '}
-                · {formatTime(selectedMeasurement.duration)} {t.duration} ·{' '}
-                {selectedMeasurement.counts.male +
-                  selectedMeasurement.counts.female +
-                  selectedMeasurement.counts.malePhone +
-                  selectedMeasurement.counts.femalePhone}{' '}
-                {t.observed}
-              </p>
             </div>
+          </div>
 
-            <div className="mb-6 flex justify-center" style={{ height: 200 }}>
-              <canvas ref={modalCanvasRef} />
-            </div>
-
-            {(() => {
-              const c = selectedMeasurement.counts;
-              const tot = c.male + c.female + c.malePhone + c.femalePhone;
-              const noInfr = c.male + c.female;
-              const totMale = c.male + c.malePhone;
-              const totFemale = c.female + c.femalePhone;
-              const legendRows = [
-                { color: '#2563eb', label: t.malePhone, value: c.malePhone },
-                {
-                  color: '#db2777',
-                  label: t.femalePhone,
-                  value: c.femalePhone,
-                },
-                { color: '#374151', label: t.noInfraction, value: noInfr },
-              ];
+          {/* History */}
+          {measurements.length > 0 &&
+            (() => {
+              const gMale = measurements.reduce((s, m) => s + m.counts.male, 0);
+              const gFemale = measurements.reduce(
+                (s, m) => s + m.counts.female,
+                0
+              );
+              const gMalePhone = measurements.reduce(
+                (s, m) => s + m.counts.malePhone,
+                0
+              );
+              const gFemalePhone = measurements.reduce(
+                (s, m) => s + m.counts.femalePhone,
+                0
+              );
+              const gTotal = gMale + gFemale + gMalePhone + gFemalePhone;
+              const gTotalMale = gMale + gMalePhone;
+              const gTotalFemale = gFemale + gFemalePhone;
+              const gMaxCombo = measurements.reduce(
+                (max, m) => Math.max(max, m.longestCombo ?? 0),
+                0
+              );
+              const locale = lang === 'it' ? 'it-IT' : 'en-US';
               return (
-                <>
-                  <div className="mb-4 space-y-2">
-                    {legendRows.map((r) => (
-                      <div
-                        key={r.label}
-                        className="flex items-center gap-3 text-sm"
-                      >
-                        <span
-                          className="legend-dot"
-                          style={{ background: r.color }}
+                <div>
+                  {/* Global aggregated stats */}
+                  <div className="stat-card mb-4">
+                    <div className="mb-3 flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs tracking-widest text-gray-500 uppercase">
+                        <ChartPieIcon
+                          style={{
+                            width: '0.875rem',
+                            height: '0.875rem',
+                            color: '#4b5563',
+                          }}
                         />
-                        <span className="flex-1 text-gray-300">{r.label}</span>
-                        <span className="mono text-gray-400">{r.value}</span>
+                        {t.allTimeTotals(measurements.length)}
+                      </div>
+                      {gMaxCombo >= 2 && (
                         <span
-                          className="mono w-12 text-right font-medium"
-                          style={{ color: r.color }}
+                          className="combo-pill combo-active"
+                          style={{ fontSize: '0.65rem', padding: '1px 7px' }}
                         >
-                          {tot ? pct(r.value, tot) : 0}%
+                          🔥 {gMaxCombo}×
                         </span>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="stat-card text-center">
+                        <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
+                          {t.maleRate}
+                        </div>
+                        <div className="mono text-2xl text-blue-400">
+                          {gTotalMale ? pct(gMalePhone, gTotalMale) : 0}%
+                        </div>
+                        <div className="mt-1 text-xs text-gray-600">
+                          {gMalePhone}/{gTotalMale}
+                        </div>
                       </div>
-                    ))}
+                      <div className="stat-card text-center">
+                        <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
+                          {t.femaleRate}
+                        </div>
+                        <div className="mono text-2xl text-pink-400">
+                          {gTotalFemale ? pct(gFemalePhone, gTotalFemale) : 0}%
+                        </div>
+                        <div className="mt-1 text-xs text-gray-600">
+                          {gFemalePhone}/{gTotalFemale}
+                        </div>
+                      </div>
+                      <div className="stat-card text-center">
+                        <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
+                          {t.overall}
+                        </div>
+                        <div className="mono text-2xl text-white">
+                          {gTotal ? pct(gMalePhone + gFemalePhone, gTotal) : 0}%
+                        </div>
+                        <div className="mt-1 text-xs text-gray-600">
+                          {gMalePhone + gFemalePhone}/{gTotal}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <hr className="divider my-4" />
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="stat-card text-center">
-                      <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
-                        {t.maleRate}
-                      </div>
-                      <div className="mono text-2xl text-blue-400">
-                        {totMale ? pct(c.malePhone, totMale) : 0}%
-                      </div>
-                      <div className="mt-1 text-xs text-gray-600">
-                        {c.malePhone}/{totMale}
-                      </div>
-                    </div>
-                    <div className="stat-card text-center">
-                      <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
-                        {t.femaleRate}
-                      </div>
-                      <div className="mono text-2xl text-pink-400">
-                        {totFemale ? pct(c.femalePhone, totFemale) : 0}%
-                      </div>
-                      <div className="mt-1 text-xs text-gray-600">
-                        {c.femalePhone}/{totFemale}
-                      </div>
-                    </div>
-                    <div className="stat-card text-center">
-                      <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
-                        {t.overall}
-                      </div>
-                      <div className="mono text-2xl text-white">
-                        {tot ? pct(c.malePhone + c.femalePhone, tot) : 0}%
-                      </div>
-                      <div className="mt-1 text-xs text-gray-600">
-                        {c.malePhone + c.femalePhone}/{tot}
-                      </div>
-                    </div>
-                  </div>
-                  <hr className="divider my-4" />
-                  <button
-                    className="flex w-full items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium text-red-500 transition-colors hover:bg-red-950 hover:text-red-400"
-                    onClick={() => setPendingDeleteId(selectedMeasurement.id)}
-                  >
-                    <TrashIcon
-                      style={{ width: '0.8rem', height: '0.8rem' }}
+
+                  <div className="mb-3 flex items-center gap-2 text-xs tracking-widest text-gray-500 uppercase">
+                    <ClockRotateLeftIcon
+                      style={{
+                        width: '0.875rem',
+                        height: '0.875rem',
+                        color: '#4b5563',
+                      }}
                     />
-                    {t.deleteMeasurement}
-                  </button>
-                </>
+                    {t.pastMeasurements}
+                  </div>
+                  <div className="space-y-2">
+                    {measurements.map((m, i) => {
+                      const c = m.counts;
+                      const tot =
+                        c.male + c.female + c.malePhone + c.femalePhone;
+                      const infrPct = tot
+                        ? pct(c.malePhone + c.femalePhone, tot)
+                        : 0;
+                      const d = new Date(m.date);
+                      const dateStr = d.toLocaleDateString(locale, {
+                        month: 'short',
+                        day: 'numeric',
+                      });
+                      const timeStr = d.toLocaleTimeString(locale, {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      });
+                      const rateColor =
+                        infrPct > 50
+                          ? 'text-red-400'
+                          : infrPct > 20
+                            ? 'text-amber-400'
+                            : 'text-green-400';
+                      return (
+                        <div
+                          key={m.id}
+                          className="history-item"
+                          onClick={() => setSelectedMeasurement(m)}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ')
+                              setSelectedMeasurement(m);
+                          }}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="font-semibold tracking-wide text-white">
+                                {t.measurement(measurements.length - i)}
+                              </div>
+                              <div className="mono mt-0.5 text-xs text-gray-500">
+                                {dateStr} · {timeStr} · {formatTime(m.duration)}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div
+                                className={`mono text-lg font-medium ${rateColor}`}
+                              >
+                                {infrPct}%
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {t.infractionRate}
+                              </div>
+                            </div>
+                            <ChevronRightIcon
+                              className="ml-3 text-gray-600"
+                              style={{ width: '0.75rem', height: '0.75rem' }}
+                            />
+                          </div>
+                          <div className="mt-3 flex gap-3">
+                            <div className="flex items-center gap-1.5 text-xs">
+                              <span
+                                className="h-2 w-2 rounded-full"
+                                style={{ background: '#2563eb' }}
+                              />
+                              <span className="text-gray-400">
+                                {c.male}{' '}
+                                <span className="text-blue-400">
+                                  +{c.malePhone}📱
+                                </span>
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-xs">
+                              <span
+                                className="h-2 w-2 rounded-full"
+                                style={{ background: '#db2777' }}
+                              />
+                              <span className="text-gray-400">
+                                {c.female}{' '}
+                                <span className="text-pink-400">
+                                  +{c.femalePhone}📱
+                                </span>
+                              </span>
+                            </div>
+                            {(m.longestCombo ?? 0) >= 2 && (
+                              <span
+                                className="combo-pill combo-active"
+                                style={{
+                                  fontSize: '0.65rem',
+                                  padding: '1px 7px',
+                                }}
+                              >
+                                🔥 {m.longestCombo}×
+                              </span>
+                            )}
+                            <div className="ml-auto text-xs text-gray-500">
+                              {tot} {t.observed}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               );
             })()}
-          </div>
         </div>
-      )}
 
-      {/* Confirm delete modal */}
-      {pendingDeleteId !== null && (
-        <div
-          className="modal-bg"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setPendingDeleteId(null);
-          }}
-        >
-          <div className="modal-card" style={{ maxWidth: 360 }}>
-            <h2 className="mb-2 text-lg font-bold text-white">
-              {t.deleteConfirmTitle}
-            </h2>
-            <p className="mb-5 text-sm text-gray-400">{t.deleteConfirmBody}</p>
-            <div className="flex gap-3">
+        {/* Detail modal */}
+        {selectedMeasurement && (
+          <div
+            className="modal-bg"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setSelectedMeasurement(null);
+            }}
+          >
+            <div className="modal-card">
               <button
-                className="ctrl-btn ctrl-undo flex-1"
-                onClick={() => setPendingDeleteId(null)}
+                onClick={() => setSelectedMeasurement(null)}
+                className="modal-close-btn text-gray-500 transition-colors hover:text-white"
               >
-                {t.cancel}
+                <XMarkIcon style={{ width: '1.25rem', height: '1.25rem' }} />
               </button>
+              <div className="mb-4 pr-8">
+                <h2 className="text-xl font-bold tracking-wide text-white">
+                  {t.measurementResults}
+                </h2>
+                <p className="mono mt-0.5 text-xs text-gray-500">
+                  {new Date(selectedMeasurement.date).toLocaleDateString(
+                    lang === 'it' ? 'it-IT' : 'en-US',
+                    { weekday: 'long', month: 'long', day: 'numeric' }
+                  )}{' '}
+                  · {formatTime(selectedMeasurement.duration)} {t.duration} ·{' '}
+                  {selectedMeasurement.counts.male +
+                    selectedMeasurement.counts.female +
+                    selectedMeasurement.counts.malePhone +
+                    selectedMeasurement.counts.femalePhone}{' '}
+                  {t.observed}
+                </p>
+              </div>
+
+              <div className="mb-6 flex justify-center" style={{ height: 200 }}>
+                <canvas ref={modalCanvasRef} />
+              </div>
+
+              {(() => {
+                const c = selectedMeasurement.counts;
+                const tot = c.male + c.female + c.malePhone + c.femalePhone;
+                const noInfr = c.male + c.female;
+                const totMale = c.male + c.malePhone;
+                const totFemale = c.female + c.femalePhone;
+                const legendRows = [
+                  { color: '#2563eb', label: t.malePhone, value: c.malePhone },
+                  {
+                    color: '#db2777',
+                    label: t.femalePhone,
+                    value: c.femalePhone,
+                  },
+                  { color: '#374151', label: t.noInfraction, value: noInfr },
+                ];
+                return (
+                  <>
+                    <div className="mb-4 space-y-2">
+                      {legendRows.map((r) => (
+                        <div
+                          key={r.label}
+                          className="flex items-center gap-3 text-sm"
+                        >
+                          <span
+                            className="legend-dot"
+                            style={{ background: r.color }}
+                          />
+                          <span className="flex-1 text-gray-300">
+                            {r.label}
+                          </span>
+                          <span className="mono text-gray-400">{r.value}</span>
+                          <span
+                            className="mono w-12 text-right font-medium"
+                            style={{ color: r.color }}
+                          >
+                            {tot ? pct(r.value, tot) : 0}%
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <hr className="divider my-4" />
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="stat-card text-center">
+                        <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
+                          {t.maleRate}
+                        </div>
+                        <div className="mono text-2xl text-blue-400">
+                          {totMale ? pct(c.malePhone, totMale) : 0}%
+                        </div>
+                        <div className="mt-1 text-xs text-gray-600">
+                          {c.malePhone}/{totMale}
+                        </div>
+                      </div>
+                      <div className="stat-card text-center">
+                        <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
+                          {t.femaleRate}
+                        </div>
+                        <div className="mono text-2xl text-pink-400">
+                          {totFemale ? pct(c.femalePhone, totFemale) : 0}%
+                        </div>
+                        <div className="mt-1 text-xs text-gray-600">
+                          {c.femalePhone}/{totFemale}
+                        </div>
+                      </div>
+                      <div className="stat-card text-center">
+                        <div className="mb-1 text-xs tracking-wider text-gray-500 uppercase">
+                          {t.overall}
+                        </div>
+                        <div className="mono text-2xl text-white">
+                          {tot ? pct(c.malePhone + c.femalePhone, tot) : 0}%
+                        </div>
+                        <div className="mt-1 text-xs text-gray-600">
+                          {c.malePhone + c.femalePhone}/{tot}
+                        </div>
+                      </div>
+                    </div>
+                    <hr className="divider my-4" />
+                    <button
+                      className="flex w-full items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium text-red-500 transition-colors hover:bg-red-950 hover:text-red-400"
+                      onClick={() => setPendingDeleteId(selectedMeasurement.id)}
+                    >
+                      <TrashIcon
+                        style={{ width: '0.8rem', height: '0.8rem' }}
+                      />
+                      {t.deleteMeasurement}
+                    </button>
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+
+        {/* Confirm delete modal */}
+        {pendingDeleteId !== null && (
+          <div
+            className="modal-bg"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setPendingDeleteId(null);
+            }}
+          >
+            <div className="modal-card" style={{ maxWidth: 360 }}>
+              <h2 className="mb-2 text-lg font-bold text-white">
+                {t.deleteConfirmTitle}
+              </h2>
+              <p className="mb-5 text-sm text-gray-400">
+                {t.deleteConfirmBody}
+              </p>
+              <div className="flex gap-3">
+                <button
+                  className="ctrl-btn ctrl-undo flex-1"
+                  onClick={() => setPendingDeleteId(null)}
+                >
+                  {t.cancel}
+                </button>
+                <button
+                  className="ctrl-btn ctrl-end flex-1"
+                  onClick={() => {
+                    setMeasurements((prev) =>
+                      prev.filter((x) => x.id !== pendingDeleteId)
+                    );
+                    if (selectedMeasurement?.id === pendingDeleteId)
+                      setSelectedMeasurement(null);
+                    setPendingDeleteId(null);
+                  }}
+                >
+                  {t.delete}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Help Modal */}
+        {showHelp && (
+          <div
+            className="modal-bg"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowHelp(false);
+            }}
+          >
+            <div className="modal-card">
               <button
-                className="ctrl-btn ctrl-end flex-1"
-                onClick={() => {
-                  setMeasurements((prev) =>
-                    prev.filter((x) => x.id !== pendingDeleteId)
-                  );
-                  if (selectedMeasurement?.id === pendingDeleteId)
-                    setSelectedMeasurement(null);
-                  setPendingDeleteId(null);
-                }}
+                onClick={() => setShowHelp(false)}
+                className="modal-close-btn text-gray-500 transition-colors hover:text-white"
               >
-                {t.delete}
+                <XMarkIcon style={{ width: '1.25rem', height: '1.25rem' }} />
+              </button>
+
+              <h2 className="mb-4 text-xl font-bold tracking-wide text-white">
+                {t.helpTitle}
+              </h2>
+
+              {/* English instructions */}
+              <div className="mb-5">
+                <h3 className="mb-2 text-sm font-bold tracking-widest text-gray-400 uppercase">
+                  🇬🇧 English
+                </h3>
+                <ol className="space-y-2 text-sm text-gray-300">
+                  <li>
+                    <span className="font-semibold text-white">1.</span> Tap{' '}
+                    <span className="font-semibold text-green-400">Start</span>{' '}
+                    to begin a new measurement session — the timer will start
+                    counting.
+                  </li>
+                  <li>
+                    <span className="font-semibold text-white">2.</span> For
+                    each vehicle you observe, tap the appropriate button:
+                    <ul className="mt-1 ml-4 space-y-1">
+                      <li>
+                        <span className="text-blue-400">😊 Male driver</span> or{' '}
+                        <span className="text-pink-400">😊 Female driver</span>{' '}
+                        — driver is not using a phone.
+                      </li>
+                      <li>
+                        <span className="text-blue-400">📱 Male + phone</span>{' '}
+                        or{' '}
+                        <span className="text-pink-400">📱 Female + phone</span>{' '}
+                        — driver is using a phone (infraction).
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                    <span className="font-semibold text-white">3.</span> Use the{' '}
+                    <span className="font-semibold text-yellow-400">
+                      ↺ Undo
+                    </span>{' '}
+                    button to remove the last recorded entry.
+                  </li>
+                  <li>
+                    <span className="font-semibold text-white">4.</span> Tap{' '}
+                    <span className="font-semibold text-yellow-400">Pause</span>{' '}
+                    to pause the timer, then{' '}
+                    <span className="font-semibold text-green-400">Resume</span>{' '}
+                    to continue.
+                  </li>
+                  <li>
+                    <span className="font-semibold text-white">5.</span> Tap the{' '}
+                    <span className="font-semibold text-red-400">🏁 End</span>{' '}
+                    button to save the session and view the results.
+                  </li>
+                  <li>
+                    <span className="font-semibold text-white">6.</span> Tap any
+                    saved session in the history to see its detailed breakdown
+                    and chart.
+                  </li>
+                  <li>
+                    <span className="font-semibold text-white">7.</span> Use the{' '}
+                    <span className="font-semibold text-gray-300">🔊</span> icon
+                    to toggle sound effects and{' '}
+                    <span className="font-semibold text-gray-300">EN / IT</span>{' '}
+                    to switch the interface language.
+                  </li>
+                </ol>
+              </div>
+
+              <div className="border-t border-gray-700" />
+
+              {/* Italian instructions */}
+              <div className="mt-5 mb-2">
+                <h3 className="mb-2 text-sm font-bold tracking-widest text-gray-400 uppercase">
+                  🇮🇹 Italiano
+                </h3>
+                <ol className="space-y-2 text-sm text-gray-300">
+                  <li>
+                    <span className="font-semibold text-white">1.</span> Premi{' '}
+                    <span className="font-semibold text-green-400">Inizia</span>{' '}
+                    per avviare una nuova sessione di misurazione — il timer
+                    inizierà a scorrere.
+                  </li>
+                  <li>
+                    <span className="font-semibold text-white">2.</span> Per
+                    ogni veicolo osservato, premi il pulsante appropriato:
+                    <ul className="mt-1 ml-4 space-y-1">
+                      <li>
+                        <span className="text-blue-400">😊 Guida uomo</span> o{' '}
+                        <span className="text-pink-400">😊 Guida donna</span> —
+                        il conducente non usa il telefono.
+                      </li>
+                      <li>
+                        <span className="text-blue-400">
+                          📱 Uomo + telefono
+                        </span>{' '}
+                        o{' '}
+                        <span className="text-pink-400">
+                          📱 Donna + telefono
+                        </span>{' '}
+                        — il conducente sta usando il telefono (infrazione).
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                    <span className="font-semibold text-white">3.</span> Usa il
+                    pulsante{' '}
+                    <span className="font-semibold text-yellow-400">
+                      ↺ Annulla
+                    </span>{' '}
+                    per rimuovere l&apos;ultima voce registrata.
+                  </li>
+                  <li>
+                    <span className="font-semibold text-white">4.</span> Premi{' '}
+                    <span className="font-semibold text-yellow-400">Pausa</span>{' '}
+                    per mettere in pausa il timer, poi{' '}
+                    <span className="font-semibold text-green-400">
+                      Riprendi
+                    </span>{' '}
+                    per continuare.
+                  </li>
+                  <li>
+                    <span className="font-semibold text-white">5.</span> Premi
+                    il pulsante{' '}
+                    <span className="font-semibold text-red-400">🏁 Fine</span>{' '}
+                    per salvare la sessione e visualizzare i risultati.
+                  </li>
+                  <li>
+                    <span className="font-semibold text-white">6.</span> Tocca
+                    una sessione salvata nella cronologia per vedere il
+                    dettaglio e il grafico.
+                  </li>
+                  <li>
+                    <span className="font-semibold text-white">7.</span> Usa
+                    l&apos;icona{' '}
+                    <span className="font-semibold text-gray-300">🔊</span> per
+                    attivare/disattivare i suoni e{' '}
+                    <span className="font-semibold text-gray-300">EN / IT</span>{' '}
+                    per cambiare la lingua dell&apos;interfaccia.
+                  </li>
+                </ol>
+              </div>
+
+              <button
+                className="ctrl-btn ctrl-undo mt-4 w-full"
+                onClick={() => setShowHelp(false)}
+              >
+                {t.close}
               </button>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
 
-    <footer className="pb-4 text-center text-xs text-gray-600">
-      <a
-        href="https://github.com/tagliala-labs/instacrash"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="transition-colors hover:text-gray-400"
-      >
-        github.com/tagliala-labs/instacrash
-      </a>
-    </footer>
-  </>
+      <footer className="pb-4 text-center text-xs text-gray-600">
+        <a
+          href="https://github.com/tagliala-labs/instacrash"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="transition-colors hover:text-gray-400"
+        >
+          github.com/tagliala-labs/instacrash
+        </a>
+      </footer>
+    </>
   );
 }
